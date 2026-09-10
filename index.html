@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>恋语 · 双生</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Georgia', 'Times New Roman', 'Noto Serif SC', serif;
+            background: #1a1410;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        .app {
+            width: 100%;
+            max-width: 480px;
+            background: #f5ede4;
+            border-radius: 28px;
+            overflow: hidden;
+            position: relative;
+            min-height: 780px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+        }
+        .page {
+            display: none;
+            padding: 20px 16px 30px;
+            min-height: 780px;
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .page.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            0% { opacity: 0.4; transform: translateX(30px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ===== 首页 ===== */
+        #page-home {
+            background: #f5ede4;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            padding: 30px 20px;
+            min-height: 780px;
+        }
+        #page-home.active {
+            display: flex;
+        }
+        /* 共享模式：谷子/书信打开时 */
+        #page-home.shared-mode {
+            justify-content: flex-start;
+            align-items: stretch;
+            padding: 20px 16px 30px;
+        }
+        #page-home.shared-mode .home-morphs,
+        #page-home.shared-mode .home-shared {
+            display: none !important;
+        }
+        #shared-container {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #page-home.shared-mode #shared-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .home-morphs {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .home-morph {
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+        .home-morph:active {
+            transform: scale(0.94);
+            opacity: 0.7;
+        }
+        .home-morph img {
+            width: 100%;
+            display: block;
+        }
+        .home-morph .morph-label {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            color: #f5ede4;
+            padding: 6px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* 首页共用按钮 */
+        .home-shared {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 4px;
+        }
+        .shared-btn {
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: none;
+            background: transparent;
+            padding: 0;
+            position: relative;
+            aspect-ratio: 1.4 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .shared-btn:active {
+            transform: scale(0.92);
+            filter: brightness(0.7);
+        }
+        .shared-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            padding: 4px;
+        }
+        .shared-btn .shared-label {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            color: #f5ede4;
+            padding: 3px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        /* ===== 形态页面 ===== */
+        .morph-page {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 780px;
+            padding: 20px 16px 30px;
+            position: relative;
+            display: none;
+            flex-direction: column;
+        }
+        .morph-page.active {
+            display: flex;
+            animation: slideIn 0.5s ease-out;
+        }
+        .morph-page .morph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            flex-shrink: 0;
+        }
+        .morph-page .morph-header .back-btn {
+            background: none;
+            border: none;
+            color: #f5ede4;
+            font-size: 1.6rem;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 30px;
+            transition: 0.2s;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+        .morph-page .morph-header .back-btn:active {
+            transform: scale(0.85);
+            opacity: 0.5;
+        }
+        .morph-page .morph-header .morph-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f5ede4;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+            letter-spacing: 4px;
+        }
+
+        /* ===== 形态页按钮排版 ===== */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+        .morph-btn {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            background: transparent;
+            padding: 0;
+            position: relative;
+            aspect-ratio: 1 / 1;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .morph-btn:active {
+            transform: scale(0.92);
+            filter: brightness(0.7);
+        }
+        .morph-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            padding: 4px;
+        }
+        .morph-btn .btn-label {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            color: #f5ede4;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .morph-btn-text {
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(6px);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            aspect-ratio: 1 / 1;
+            min-height: 90px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+        .morph-btn-text:active {
+            transform: scale(0.92);
+            filter: brightness(0.7);
+        }
+        .morph-btn-text::before,
+        .morph-btn-text::after {
+            content: '✦';
+            position: absolute;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 0.8rem;
+        }
+        .morph-btn-text::before { top: 8px; left: 10px; }
+        .morph-btn-text::after { bottom: 8px; right: 10px; }
+        .morph-btn-text .text-label {
+            font-family: 'Noto Serif SC', serif;
+            color: #f5ede4;
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+            line-height: 1.6;
+            text-align: center;
+        }
+        .morph-btn-text .text-sub {
+            font-size: 0.5rem;
+            color: rgba(255, 255, 255, 0.25);
+            letter-spacing: 3px;
+            margin-top: 4px;
+            font-family: 'Georgia', serif;
+        }
+        .morph-btn-text .corner {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 1.2rem;
+        }
+        .morph-btn-text .corner-tl { top: 6px; left: 8px; }
+        .morph-btn-text .corner-br { bottom: 6px; right: 8px; }
+
+        /* ===== 问卷便签 ===== */
+        .question-area {
+            flex-shrink: 0;
+            margin-top: 24px;
+            padding-top: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .question-card {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 18px 20px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        .question-card .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .question-card .q-header .q-day {
+            font-size: 0.55rem;
+            color: rgba(255, 255, 255, 0.25);
+            letter-spacing: 2px;
+        }
+        .question-card .q-header .q-bird {
+            font-size: 0.8rem;
+            opacity: 0.3;
+        }
+        .question-card .q-text {
+            font-size: 1rem;
+            color: #f5ede4;
+            line-height: 1.7;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 12px;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+        .question-card .q-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .question-card .q-row .q-input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.2);
+            color: #f5ede4;
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            transition: 0.2s;
+        }
+        .question-card .q-row .q-input:focus {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        .question-card .q-row .q-input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+        .question-card .q-row .q-input:disabled {
+            opacity: 0.5;
+        }
+        .question-card .q-row .q-submit {
+            padding: 10px 18px;
+            border-radius: 14px;
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: #f5ede4;
+            font-size: 0.8rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .question-card .q-row .q-submit:active {
+            transform: scale(0.92);
+            opacity: 0.6;
+        }
+        .question-card .q-row .q-submit:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .dream-answer-wrapper {
+            margin-top: 12px;
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            min-height: 50px;
+            transition: all 0.4s ease;
+        }
+        .dream-answer-wrapper .dream-blur {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: opacity 0.6s ease;
+        }
+        .dream-answer-wrapper .dream-blur.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .dream-answer-wrapper .dream-blur span {
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+        }
+        .dream-answer-wrapper .dream-text {
+            padding: 12px 16px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            font-style: italic;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+        .dream-answer-wrapper .dream-text.empty {
+            color: rgba(255, 255, 255, 0.15);
+            font-style: normal;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+        }
+
+        /* ===== 子页面 ===== */
+        .sub-page {
+            display: none;
+            animation: slideIn 0.4s ease-out;
+            padding: 16px 0;
+            flex: 1;
+        }
+        .sub-page.active {
+            display: block;
+        }
+        .sub-page .sub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .sub-page .sub-header .sub-back {
+            background: none;
+            border: none;
+            color: #f5ede4;
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 30px;
+            transition: 0.2s;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+        .sub-page .sub-header .sub-back:active {
+            transform: scale(0.85);
+            opacity: 0.5;
+        }
+        .sub-page .sub-header .sub-title {
+            font-size: 1rem;
+            color: #f5ede4;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+
+        /* ===== 3×3 九宫格 ===== */
+        .grid-wrapper {
+            max-height: 620px;
+            overflow-y: auto;
+            padding-right: 4px;
+            border-radius: 16px;
+            background-size: cover;
+            background-position: center;
+            padding: 12px;
+        }
+        .grid-wrapper::-webkit-scrollbar { width: 4px; }
+        .grid-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        .grid-3x3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .grid-item {
+            aspect-ratio: 1 / 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+        }
+        .grid-item:active { transform: scale(0.94); }
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .grid-item .empty-placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.7rem;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        .grid-item .grid-desc {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            padding: 4px 8px;
+            color: #f5ede4;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        /* 图片删除按钮 */
+        .grid-item .grid-del-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.65);
+            color: #f5ede4;
+            border: none;
+            cursor: pointer;
+            font-size: 0.75rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            z-index: 3;
+            padding: 0;
+        }
+        .grid-item .grid-del-btn:active {
+            transform: scale(0.85);
+            background: rgba(131, 47, 35, 0.9);
+        }
+
+        /* ===== 文稿卡片 ===== */
+        .doc-item {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+        }
+        .doc-item .doc-text {
+            color: #f5ede4;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+        .doc-item .doc-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .doc-item .doc-actions button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
+        .doc-item .doc-actions button:active {
+            transform: scale(0.85);
+            opacity: 0.5;
+        }
+
+        /* ===== 问答卡片 ===== */
+        .doc-item.qna-item {
+            background: rgba(0, 0, 0, 0.35);
+        }
+        .qna-question {
+            font-family: 'Noto Serif SC', serif;
+            color: #f5ede4;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+        .qna-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 0.82rem;
+            line-height: 1.6;
+        }
+        .qna-label {
+            flex-shrink: 0;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Noto Serif SC', serif;
+            letter-spacing: 2px;
+            font-size: 0.75rem;
+            padding-top: 1px;
+        }
+        .qna-text {
+            color: #f5ede4;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+            word-break: break-word;
+        }
+        .qna-text.dream {
+            color: rgba(255, 255, 255, 0.78);
+            font-style: italic;
+        }
+
+        .upload-fab {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 60px;
+            padding: 8px 18px;
+            color: #f5ede4;
+            font-size: 0.8rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 2px;
+        }
+        .upload-fab:active {
+            transform: scale(0.92);
+            opacity: 0.6;
+        }
+
+        /* ===== 弹窗 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #f5ede4;
+            border-radius: 28px;
+            padding: 24px 20px 28px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s ease-out;
+        }
+        @keyframes modalIn {
+            0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-box .modal-title {
+            font-size: 1.1rem;
+            color: #3E2D45;
+            text-align: center;
+            margin-bottom: 16px;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+        .modal-box .form-group { margin-bottom: 12px; }
+        .modal-box .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #836529;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+        .modal-box .form-group input,
+        .modal-box .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e8ddd0;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            background: #fffcf8;
+            font-family: inherit;
+            color: #3E2D45;
+            outline: none;
+            transition: 0.2s;
+        }
+        .modal-box .form-group textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        .modal-box .form-group .file-label {
+            display: inline-block;
+            background: #e8ddd0;
+            padding: 6px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #3E2D45;
+            transition: 0.2s;
+        }
+        .modal-box .form-group .file-label:active { transform: scale(0.94); }
+        .modal-box .form-group .file-label input { display: none; }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .modal-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .modal-actions .btn-submit {
+            background: #832F23;
+            color: #fff;
+        }
+        .modal-actions .btn-submit:active {
+            transform: scale(0.94);
+            opacity: 0.7;
+        }
+        .modal-actions .btn-cancel {
+            background: #e8ddd0;
+            color: #3E2D45;
+        }
+        .modal-actions .btn-cancel:active {
+            transform: scale(0.94);
+            opacity: 0.6;
+        }
+
+        /* ===== 图片放大查看器 ===== */
+        .image-viewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .image-viewer.open { display: flex; }
+        .image-viewer .viewer-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            background: none;
+        }
+        .image-viewer .viewer-close:active {
+            transform: scale(0.85);
+            opacity: 0.5;
+        }
+        .image-viewer .viewer-img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 16px;
+            object-fit: contain;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+        .image-viewer .viewer-desc {
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 16px;
+            font-size: 0.9rem;
+            text-align: center;
+            letter-spacing: 2px;
+            max-width: 80%;
+        }
+        .image-viewer .viewer-nav {
+            display: flex;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        .image-viewer .viewer-nav button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 4px 16px;
+            border-radius: 40px;
+        }
+        .image-viewer .viewer-nav button:active {
+            transform: scale(0.85);
+            opacity: 0.5;
+        }
+
+        @media (max-width: 400px) {
+            .app { border-radius: 16px; }
+            .page { padding: 14px 12px 20px; }
+            #page-home { padding: 20px 14px; gap: 14px; }
+            #page-home.shared-mode { padding: 14px 12px 20px; }
+            .home-morph .morph-label { font-size: 0.7rem; padding: 4px 16px; }
+            .home-shared { gap: 10px; }
+            .shared-btn .shared-label { font-size: 0.6rem; padding: 2px 10px; }
+            .btn-grid { gap: 8px; }
+            .morph-btn { min-height: 70px; }
+            .morph-btn-text { min-height: 70px; }
+            .morph-btn .btn-label { font-size: 0.5rem; padding: 2px 8px; }
+            .morph-btn-text .text-label { font-size: 0.7rem; letter-spacing: 4px; }
+            .grid-wrapper { max-height: 520px; padding: 8px; }
+            .grid-3x3 { gap: 6px; }
+            .modal-box { padding: 16px 14px; }
+            .question-area { margin-top: 18px; }
+            .question-card { padding: 14px 16px 16px; }
+            .question-card .q-text { font-size: 0.9rem; }
+            .question-card .q-row .q-input { font-size: 0.75rem; padding: 8px 12px; }
+            .question-card .q-row .q-submit { font-size: 0.7rem; padding: 8px 14px; }
+            .dream-answer-wrapper .dream-text { font-size: 0.8rem; padding: 10px 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app" id="app">
+
+        <div class="page active" id="page-home">
+            <div class="home-morphs" id="home-morphs">
+                <div class="home-morph" data-morph="1">
+                    <img src="images/a1.png" alt="形态一">
+                    <div class="morph-label">暖樱 · 天海愁</div>
+                </div>
+                <div class="home-morph" data-morph="2">
+                    <img src="images/a2.png" alt="形态二">
+                    <div class="morph-label">水镜 · 琉鱼</div>
+                </div>
+            </div>
+            <div class="home-shared" id="home-shared">
+                <button class="shared-btn" data-shared="guzi">
+                    <img src="images/c2.png" alt="谷子相册">
+                    <span class="shared-label">谷子相册</span>
+                </button>
+                <button class="shared-btn" data-shared="letter">
+                    <img src="images/c3.png" alt="书信">
+                    <span class="shared-label">书信</span>
+                </button>
+            </div>
+            <div id="shared-container"></div>
+        </div>
+
+        <div class="morph-page" id="page-morph1" style="background-image: url('images/b1.png');">
+            <div class="morph-header">
+                <button class="back-btn" data-back="home">‹</button>
+                <span class="morph-name">暖樱 · 天海愁</span>
+                <span style="width: 40px;"></span>
+            </div>
+
+            <div class="btn-grid" id="btn-grid-1">
+                <button class="morph-btn" data-sub="album1">
+                    <img src="images/c1.png" alt="画稿相册">
+                    <span class="btn-label">画稿相册</span>
+                </button>
+                <button class="morph-btn-text" data-sub="reality1">
+                    <span class="corner corner-tl">❀</span>
+                    <span class="text-label">现世</span>
+                    <span class="text-sub">— 日常 —</span>
+                    <span class="corner corner-br">❀</span>
+                </button>
+                <button class="morph-btn" data-sub="ifline1">
+                    <img src="images/c4.png" alt="if线">
+                    <span class="btn-label">if线</span>
+                </button>
+            </div>
+
+            <div class="question-area" id="question-area-1">
+                <div class="question-card">
+                    <div class="q-header">
+                        <span class="q-day">✦ 今日之问</span>
+                        <span class="q-bird">🕊</span>
+                    </div>
+                    <div class="q-text" id="q-text-1">加载中…</div>
+                    <div class="q-row">
+                        <input class="q-input" id="q-input-1" placeholder="写下你的回答…" />
+                        <button class="q-submit" id="q-submit-1">提交</button>
+                    </div>
+                    <div class="dream-answer-wrapper">
+                        <div class="dream-blur" id="dream-blur-1">
+                            <span>✦ 梦设的回答 ✦</span>
+                        </div>
+                        <div class="dream-text empty" id="dream-text-1">等待你的回答…</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sub1-container"></div>
+        </div>
+
+        <div class="morph-page" id="page-morph2" style="background-image: url('images/b2.png');">
+            <div class="morph-header">
+                <button class="back-btn" data-back="home">‹</button>
+                <span class="morph-name">水镜 · 琉鱼</span>
+                <span style="width: 40px;"></span>
+            </div>
+
+            <div class="btn-grid" id="btn-grid-2">
+                <button class="morph-btn" data-sub="album2">
+                    <img src="images/d1.png" alt="画稿相册">
+                    <span class="btn-label">画稿相册</span>
+                </button>
+                <button class="morph-btn-text" data-sub="reality2">
+                    <span class="corner corner-tl">❀</span>
+                    <span class="text-label">现世</span>
+                    <span class="text-sub">— 日常 —</span>
+                    <span class="corner corner-br">❀</span>
+                </button>
+                <button class="morph-btn" data-sub="ifline2">
+                    <img src="images/d4.png" alt="if线">
+                    <span class="btn-label">if线</span>
+                </button>
+            </div>
+
+            <div class="question-area" id="question-area-2">
+                <div class="question-card">
+                    <div class="q-header">
+                        <span class="q-day">✦ 今日之问</span>
+                        <span class="q-bird">🕊</span>
+                    </div>
+                    <div class="q-text" id="q-text-2">加载中…</div>
+                    <div class="q-row">
+                        <input class="q-input" id="q-input-2" placeholder="写下你的回答…" />
+                        <button class="q-submit" id="q-submit-2">提交</button>
+                    </div>
+                    <div class="dream-answer-wrapper">
+                        <div class="dream-blur" id="dream-blur-2">
+                            <span>✦ 梦设的回答 ✦</span>
+                        </div>
+                        <div class="dream-text empty" id="dream-text-2">等待你的回答…</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sub2-container"></div>
+        </div>
+
+        <div class="modal-overlay" id="uploadModal">
+            <div class="modal-box">
+                <div class="modal-title">✧ 上传新内容 ✧</div>
+                <div class="form-group">
+                    <label>上传图片</label>
+                    <label class="file-label">
+                        📎 选择文件
+                        <input type="file" id="uploadFile" accept="image/*">
+                    </label>
+                    <span id="fileNameDisplay" style="font-size: 0.7rem; color: #836529; margin-left: 8px;"></span>
+                </div>
+                <div class="form-group">
+                    <label>文字描述</label>
+                    <textarea id="uploadDesc" placeholder="写点什么…"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" id="modalCancel">取消</button>
+                    <button class="btn-submit" id="modalSubmit">确认上传</button>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.6rem; color: #b5a696; text-align: center;">上传后所有人可见 · 可删除</div>
+            </div>
+        </div>
+
+        <div class="image-viewer" id="imageViewer">
+            <button class="viewer-close" id="viewerClose">✕</button>
+            <img class="viewer-img" id="viewerImg" src="" alt="放大">
+            <div class="viewer-desc" id="viewerDesc"></div>
+            <div class="viewer-nav">
+                <button id="viewerPrev">◀</button>
+                <button id="viewerNext">▶</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================================
+        // ★★★ 云端同步配置（jsonbin.io） ★★★
+        //
+        // 使用步骤：
+        // 1. 打开 https://jsonbin.io 注册（免费）
+        // 2. 登录后点 "Create Bin"，内容填 {} 保存
+        // 3. 复制 Bin ID（URL 里 /b/ 后面那一串）
+        // 4. 点右上角头像 → "API Keys" → 复制 X-Master-Key
+        // 5. 把下面两个值填进去，enabled 改为 true
+        // ============================================================
+        const JSONBIN_CONFIG = {
+            binId: '',         // 例：'65f1a2b3c4d5e6f7a8b9c0d1'
+            masterKey: '',     // 例：'$2a$10$abcdefg...'
+            enabled: false     // 填好后改为 true
+        };
+
+        // ================================================================
+        // ★★★ 木质叩击音效 ★★★
+        // ================================================================
+        function playWoodSound() {
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const bufferSize = ctx.sampleRate * 0.06;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    const envelope = Math.exp(-i / (ctx.sampleRate * 0.015));
+                    data[i] = (Math.random() * 2 - 1) * envelope * 0.4;
+                }
+                const noise = ctx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 800;
+                filter.Q.value = 1.2;
+                const gain = ctx.createGain();
+                gain.gain.value = 0.6;
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+                noise.start();
+                noise.stop(ctx.currentTime + 0.06);
+            } catch (e) {}
+        }
+
+        function playWoodSoundPage() {
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const bufferSize = ctx.sampleRate * 0.1;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    const envelope = Math.exp(-i / (ctx.sampleRate * 0.025));
+                    data[i] = (Math.random() * 2 - 1) * envelope * 0.35;
+                }
+                const noise = ctx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 700;
+                filter.Q.value = 1.0;
+                const gain = ctx.createGain();
+                gain.gain.value = 0.5;
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+                noise.start();
+                noise.stop(ctx.currentTime + 0.1);
+            } catch (e) {}
+        }
+
+        // ================================================================
+        // ★★★ 用户提供的26条问答 ★★★
+        // ================================================================
+        const QNA_PAIRS = [
+            { q: '如果对方变成小孩怎么照顾', a: '相比起照顾，找到变成这种状态的原因更加重要，除此之外，正常的一日三餐，小孩和大人在这种时候没有区别。' },
+            { q: '对方被产屋敷大人表扬会怎么样', a: '或许心里会开心，愁总是笑着。' },
+            { q: '对方在祭典上最想和你玩什么摊子', a: '现在有的种类很多，不太确定，有机会去的话我会记住。' },
+            { q: '看烟花的时候会说浪漫话还是注意鬼', a: '这两者并不冲突。' },
+            { q: '对方笑起来最像哪种小动物', a: '猫咪...或者狐狸，愁因为不同原因笑的样子也不一样。' },
+            { q: '对方会乖乖喝药还是偷偷倒掉', a: '会喝药，但应该算不上乖乖，愁喝药是因为知道自己想要什么，要怎么去做，是会拼命的人。' },
+            { q: '如果必须退休，想搬到哪个村', a: '现在没有办法去思考这个，考虑以后的前提是要解决当下。' },
+            { q: '有没有想购置的大件，例如留声机，自行车或者缝纫机', a: '暂时没有需要的，因为无论购买哪一样都要有时间去学会怎么使用它' },
+            { q: '互换一天身体，要做什么？', a: '让愁暂时休息，具体看能交换多久，如果时间长的话会代为照顾，但放任愁用我的身体执行任务也并不安全，所以除了休息之外还是想办法解决这种状态。' },
+            { q: '如果对方做的味增汤太咸怎么办', a: '加水。' },
+            { q: '当下最想做的事情是什么？', a: '吃鲑鱼萝卜。' },
+            { q: '买团子会喜欢什么口味？', a: '酱油。' },
+            { q: '对方把饭煮糊了怎么办', a: '如果确实是不能下咽的情况，只有重新煮一锅' },
+            { q: '会保留对方送你的什么？', a: '情况允许的情况下会都保留，没有丢下的必要和理由。' },
+            { q: '会因为什么吵架', a: '愁总是笑着，没有吵架' },
+            { q: '收到礼物的话会当场拆开吗', a: '不会' },
+            { q: '对方最常为什么事情笑', a: '很多' },
+            { q: '如果对方失忆了怎么办？', a: '重新自我介绍，先讲明情况。' },
+            { q: '如果对方变成日轮刀给他取什么名字', a: '愁，就用本身的名字' },
+            { q: '对方会在训练场睡着吗，如果看到的话你会怎么想', a: '如果有这种情况，那肯定是很累的时候，身体已经到达极限，继续训练下去没有进步只有伤害' },
+            { q: '对方失眠的话你会提供帮助吗？', a: '如果需要我帮忙的话，我会提出意见，实在睡不着的时候可以适当的拉伸活动。' },
+            { q: '受伤会瞒着吗？', a: '战斗中时会，在那种情况下告诉其他人自己受伤了只会影响大家，给敌人提供突破口。' },
+            { q: '对方喂药会喝吗', a: '会，因为原本自己也是要喝的，如果愁给出这种帮助会先道谢，但伤得不严重的情况下我自己来会更好。' },
+            { q: '对方受伤还硬撑', a: '可以理解，但既然发现了就要想办法带他治疗休息' },
+            { q: '如果只能说一句话', a: '留到最后，不得不说的时候再说' },
+            { q: '发现对方居然在偷吃病号餐！', a: '可能是肚子饿了，或者不知道这是病号餐' }
+        ];
+
+        // ================================================================
+        // ★★★ 空数据 ★★★
+        // ================================================================
+        const DEFAULT_DATA = {
+            morph1: { album: [], reality: [], ifline: [] },
+            morph2: { album: [], reality: [], ifline: [] },
+            shared: { guzi: [], letter: [] }
+        };
+
+        // ================================================================
+        // ★★★ 云端同步函数 ★★★
+        // ================================================================
+        async function syncFromCloud() {
+            if (!JSONBIN_CONFIG.enabled) return;
+            if (!JSONBIN_CONFIG.binId || !JSONBIN_CONFIG.masterKey) {
+                console.log('⚠️ jsonbin 配置未填写，跳过云端同步');
+                return;
+            }
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.binId}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.masterKey,
+                        'X-Bin-Meta': 'false'
+                    }
+                });
+                if (!res.ok) {
+                    console.log('云端拉取失败：', res.status);
+                    return;
+                }
+                const cloudData = await res.json();
+                if (cloudData && cloudData.morph1 && cloudData.morph2) {
+                    const localTime = appData._updatedAt || 0;
+                    const cloudTime = cloudData._updatedAt || 0;
+                    if (cloudTime > localTime) {
+                        appData = normalizeData(cloudData);
+                        localStorage.setItem('handbook_data', JSON.stringify(appData));
+                        console.log('✅ 已从云端同步最新数据');
+                    } else if (localTime > cloudTime) {
+                        pushToCloud(appData);
+                    }
+                } else {
+                    pushToCloud(appData);
+                }
+            } catch (e) {
+                console.log('云端同步异常：', e);
+            }
+        }
+
+        async function pushToCloud(data) {
+            if (!JSONBIN_CONFIG.enabled) return;
+            if (!JSONBIN_CONFIG.binId || !JSONBIN_CONFIG.masterKey) return;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_CONFIG.masterKey
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    console.log('✅ 已同步到云端');
+                } else {
+                    console.log('云端推送失败：', res.status);
+                }
+            } catch (e) {
+                console.log('云端推送异常：', e);
+            }
+        }
+
+        // ================================================================
+        // 存储
+        // ================================================================
+        function normalizeData(data) {
+            if (!data.shared) data.shared = { guzi: [], letter: [] };
+            if (!data.shared.guzi) data.shared.guzi = [];
+            if (!data.shared.letter) data.shared.letter = [];
+            ['morph1', 'morph2'].forEach(k => {
+                if (!data[k]) data[k] = {};
+                ['album', 'reality', 'ifline'].forEach(s => {
+                    if (!data[k][s]) data[k][s] = [];
+                });
+                if (data[k].guzi) {
+                    if (!data.shared.guzi.length) data.shared.guzi = data.shared.guzi.concat(data[k].guzi);
+                    delete data[k].guzi;
+                }
+                if (data[k].letter) {
+                    if (!data.shared.letter.length) data.shared.letter = data.shared.letter.concat(data[k].letter);
+                    delete data[k].letter;
+                }
+            });
+            return data;
+        }
+
+        function cleanLegacySamples(data) {
+            ['morph1', 'morph2'].forEach(k => {
+                ['album', 'reality', 'ifline'].forEach(s => {
+                    if (Array.isArray(data[k][s])) {
+                        data[k][s] = data[k][s].filter(item => {
+                            if (!item.id) return false;
+                            return item.id.startsWith('u_') || item.type === 'qna';
+                        });
+                    }
+                });
+            });
+            if (data.shared) {
+                ['guzi', 'letter'].forEach(t => {
+                    if (Array.isArray(data.shared[t])) {
+                        data.shared[t] = data.shared[t].filter(item => item.id && item.id.startsWith('u_'));
+                    }
+                });
+            }
+            return data;
+        }
+
+        function loadAllData() {
+            const stored = localStorage.getItem('handbook_data');
+            let data;
+            if (stored) {
+                try { data = JSON.parse(stored); } catch (e) { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+            } else {
+                data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+            }
+            data = normalizeData(data);
+            data = cleanLegacySamples(data);
+            return data;
+        }
+
+        function saveAllData(data) {
+            data._updatedAt = Date.now();
+            localStorage.setItem('handbook_data', JSON.stringify(data));
+            pushToCloud(data);
+        }
+
+        let appData = loadAllData();
+        let currentMorph = '1';
+        let currentSub = 'album';
+        let currentShared = null;
+        let viewerImages = [];
+        let viewerIndex = 0;
+
+        // ================================================================
+        // 辅助函数
+        // ================================================================
+        function getMorphData(morph) {
+            return morph === '1' ? appData.morph1 : appData.morph2;
+        }
+
+        function getSubData(morph, sub) {
+            const data = getMorphData(morph);
+            const map = { album: 'album', reality: 'reality', ifline: 'ifline' };
+            return data[map[sub]] || [];
+        }
+
+        function getSubTitle(morph, sub) {
+            const titles = {
+                '1': { album: '画稿相册', reality: '现世', ifline: 'if线' },
+                '2': { album: '画稿相册', reality: '现世', ifline: 'if线' }
+            };
+            return titles[morph]?.[sub] || sub;
+        }
+
+        function getSharedData(type) {
+            if (!appData.shared) appData.shared = { guzi: [], letter: [] };
+            return appData.shared[type] || [];
+        }
+
+        function getSharedTitle(type) {
+            return type === 'guzi' ? '谷子相册' : '书信';
+        }
+
+        function generateId() {
+            return 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+        }
+
+        function getToday() {
+            return new Date().toLocaleDateString('zh-CN');
+        }
+
+        // ================================================================
+        // 每日问答
+        // ================================================================
+        function getTodayQna() {
+            const startDate = new Date(2026, 0, 1);
+            const now = new Date();
+            const diff = Math.floor((now - startDate) / 86400000);
+            const idx = ((diff % QNA_PAIRS.length) + QNA_PAIRS.length) % QNA_PAIRS.length;
+            return QNA_PAIRS[idx];
+        }
+
+        function findTodayQnaRecord(morph, qnaText) {
+            const morphKey = morph === '1' ? 'morph1' : 'morph2';
+            const today = getToday();
+            return (appData[morphKey].reality || []).find(r =>
+                r.type === 'qna' && r.q === qnaText && r.date === today
+            );
+        }
+
+        function setupQuestion(morph) {
+            const prefix = morph;
+            const input = document.getElementById('q-input-' + prefix);
+            const submit = document.getElementById('q-submit-' + prefix);
+            const blur = document.getElementById('dream-blur-' + prefix);
+            const dreamText = document.getElementById('dream-text-' + prefix);
+            const qText = document.getElementById('q-text-' + prefix);
+
+            if (!input || !submit || !qText) return;
+
+            const qna = getTodayQna();
+            qText.textContent = qna.q;
+
+            const existing = findTodayQnaRecord(morph, qna.q);
+            if (existing) {
+                blur.classList.add('hidden');
+                dreamText.textContent = existing.dreamAnswer;
+                dreamText.className = 'dream-text';
+                input.value = existing.userAnswer;
+                input.disabled = true;
+                submit.disabled = true;
+                submit.textContent = '已回答';
+            } else {
+                blur.classList.remove('hidden');
+                dreamText.textContent = '等待你的回答…';
+                dreamText.className = 'dream-text empty';
+                input.disabled = false;
+                submit.disabled = false;
+                submit.textContent = '提交';
+                input.value = '';
+            }
+        }
+
+        function handleQuestionSubmit(morph) {
+            const prefix = morph;
+            const input = document.getElementById('q-input-' + prefix);
+            const submit = document.getElementById('q-submit-' + prefix);
+            const blur = document.getElementById('dream-blur-' + prefix);
+            const dreamText = document.getElementById('dream-text-' + prefix);
+
+            if (!input || !submit) return;
+            if (input.disabled) return;
+
+            const answer = input.value.trim();
+            if (!answer) {
+                alert('请先写下你的回答～');
+                return;
+            }
+
+            const qna = getTodayQna();
+            if (findTodayQnaRecord(morph, qna.q)) return;
+
+            const morphKey = morph === '1' ? 'morph1' : 'morph2';
+            const today = getToday();
+
+            appData[morphKey].reality.unshift({
+                id: generateId(),
+                type: 'qna',
+                q: qna.q,
+                userAnswer: answer,
+                dreamAnswer: qna.a,
+                date: today
+            });
+            saveAllData(appData);
+
+            blur.classList.add('hidden');
+            dreamText.textContent = qna.a;
+            dreamText.className = 'dream-text';
+            input.disabled = true;
+            submit.disabled = true;
+            submit.textContent = '已回答';
+
+            playWoodSound();
+        }
+
+        // ================================================================
+        // 页面切换
+        // ================================================================
+        function switchPage(pageId) {
+            const allPages = document.querySelectorAll('.page, .morph-page');
+            allPages.forEach(el => {
+                el.classList.remove('active');
+                el.style.display = 'none';
+            });
+            const target = document.getElementById(pageId);
+            if (target) {
+                target.classList.add('active');
+                target.style.display = 'flex';
+            }
+        }
+
+        // ================================================================
+        // 渲染形态子页面
+        // ================================================================
+        function renderSubPage(morph, sub) {
+            const sharedContainer = document.getElementById('shared-container');
+            if (sharedContainer) sharedContainer.innerHTML = '';
+            currentShared = null;
+
+            const containerId = 'sub' + morph + '-container';
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const btnGrid = document.getElementById('btn-grid-' + morph);
+            const questionArea = document.getElementById('question-area-' + morph);
+            if (btnGrid) btnGrid.style.display = 'none';
+            if (questionArea) questionArea.style.display = 'none';
+
+            const items = getSubData(morph, sub);
+            const isImageSub = sub === 'album';
+            const title = getSubTitle(morph, sub);
+            const bgImg = morph === '1' ? 'images/f1.png' : 'images/f2.png';
+
+            let html = `<div class="sub-page active">`;
+            html += `<div class="sub-header">
+                        <button class="sub-back" data-morph="${morph}" data-sub="${sub}">‹</button>
+                        <span class="sub-title">${title}</span>
+                        <button class="upload-fab" data-upload="${morph}|${sub}">✧ 上传</button>
+                     </div>`;
+
+            if (isImageSub) {
+                html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');">`;
+                html += `<div class="grid-3x3">`;
+                const displayItems = items.length > 0 ? items : [{ empty: true }];
+                for (let i = 0; i < Math.max(displayItems.length, 9); i++) {
+                    const item = displayItems[i];
+                    if (item && item.img) {
+                        html += `<div class="grid-item" data-img="${item.img}" data-desc="${item.text || ''}">
+                                    <img src="${item.img}" alt="图片">
+                                    <div class="grid-desc">${item.text || ''}</div>
+                                    <button class="grid-del-btn" data-del="${morph}|${sub}|${item.id}" title="删除">✕</button>
+                                 </div>`;
+                    } else {
+                        html += `<div class="grid-item"><span class="empty-placeholder">空</span></div>`;
+                    }
+                }
+                html += `</div>`;
+                html += `</div>`;
+            } else {
+                html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');">`;
+                items.forEach(item => {
+                    if (item.type === 'qna' && item.q) {
+                        html += `<div class="doc-item qna-item">
+                                    <div class="qna-question">✦ ${item.q}</div>
+                                    <div class="qna-row">
+                                        <span class="qna-label">我</span>
+                                        <span class="qna-text">${item.userAnswer || ''}</span>
+                                    </div>
+                                    <div class="qna-row">
+                                        <span class="qna-label">他</span>
+                                        <span class="qna-text dream">${item.dreamAnswer || ''}</span>
+                                    </div>
+                                    <div class="doc-meta">
+                                        <span>📅 ${item.date || ''}</span>
+                                        <div class="doc-actions">
+                                            <button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>
+                                        </div>
+                                    </div>
+                                 </div>`;
+                    } else {
+                        html += `<div class="doc-item">
+                                    <div class="doc-text">${item.text || ''}</div>
+                                    <div class="doc-meta">
+                                        <span>📅 ${item.date || ''}</span>
+                                        <div class="doc-actions">
+                                            <button data-edit="${morph}|${sub}|${item.id}">✎ 编辑</button>
+                                            <button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>
+                                        </div>
+                                    </div>
+                                 </div>`;
+                    }
+                });
+                if (items.length === 0) {
+                    html += `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:30px 0; font-size:0.8rem; letter-spacing:2px;">还没有内容，上传第一条吧</div>`;
+                }
+                html += `</div>`;
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+            bindSubEvents(container, morph, sub, false);
+        }
+
+        // ================================================================
+        // 渲染共用子页面
+        // ================================================================
+        function renderSharedPage(type) {
+            const container = document.getElementById('shared-container');
+            if (!container) return;
+
+            // ★★★ 给首页加 shared-mode ★★★
+            document.getElementById('page-home').classList.add('shared-mode');
+
+            const homeMorphs = document.getElementById('home-morphs');
+            const homeShared = document.getElementById('home-shared');
+            if (homeMorphs) homeMorphs.style.display = 'none';
+            if (homeShared) homeShared.style.display = 'none';
+
+            document.querySelectorAll('#sub1-container, #sub2-container').forEach(c => c.innerHTML = '');
+
+            currentShared = type;
+
+            const items = getSharedData(type);
+            const isImageSub = type === 'guzi';
+            const title = getSharedTitle(type);
+            const bgImg = 'images/f1.png';
+
+            let html = `<div class="sub-page active">`;
+            html += `<div class="sub-header">
+                        <button class="sub-back" data-shared-back="1">‹</button>
+                        <span class="sub-title">${title}</span>
+                        <button class="upload-fab" data-shared-upload="${type}">✧ 上传</button>
+                     </div>`;
+
+            if (isImageSub) {
+                html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');">`;
+                html += `<div class="grid-3x3">`;
+                const displayItems = items.length > 0 ? items : [{ empty: true }];
+                for (let i = 0; i < Math.max(displayItems.length, 9); i++) {
+                    const item = displayItems[i];
+                    if (item && item.img) {
+                        html += `<div class="grid-item" data-img="${item.img}" data-desc="${item.text || ''}">
+                                    <img src="${item.img}" alt="图片">
+                                    <div class="grid-desc">${item.text || ''}</div>
+                                    <button class="grid-del-btn" data-shared-del="${type}|${item.id}" title="删除">✕</button>
+                                 </div>`;
+                    } else {
+                        html += `<div class="grid-item"><span class="empty-placeholder">空</span></div>`;
+                    }
+                }
+                html += `</div>`;
+                html += `</div>`;
+            } else {
+                html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');">`;
+                items.forEach(item => {
+                    html += `<div class="doc-item">
+                                <div class="doc-text">${item.text || ''}</div>
+                                <div class="doc-meta">
+                                    <span>📅 ${item.date || ''}</span>
+                                    <div class="doc-actions">
+                                        <button data-shared-edit="${type}|${item.id}">✎ 编辑</button>
+                                        <button data-shared-del="${type}|${item.id}">✕ 删除</button>
+                                    </div>
+                                </div>
+                             </div>`;
+                });
+                if (items.length === 0) {
+                    html += `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:30px 0; font-size:0.8rem; letter-spacing:2px;">还没有内容，上传第一条吧</div>`;
+                }
+                html += `</div>`;
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+            bindSharedEvents(container, type);
+        }
+
+        // ================================================================
+        // 事件绑定：形态子页面
+        // ================================================================
+        function bindSubEvents(container, morph, sub, isShared) {
+            container.querySelector('.sub-back')?.addEventListener('click', function() {
+                playWoodSound();
+                const btnGrid = document.getElementById('btn-grid-' + morph);
+                const questionArea = document.getElementById('question-area-' + morph);
+                if (btnGrid) btnGrid.style.display = '';
+                if (questionArea) questionArea.style.display = '';
+                container.innerHTML = '';
+                setupQuestion(morph);
+            });
+
+            container.querySelector('[data-upload]')?.addEventListener('click', function() {
+                playWoodSound();
+                const val = this.dataset.upload.split('|');
+                currentMorph = val[0];
+                currentSub = val[1];
+                currentShared = null;
+                document.getElementById('uploadModal').classList.add('open');
+                document.getElementById('uploadDesc').value = '';
+                document.getElementById('uploadFile').value = '';
+                document.getElementById('fileNameDisplay').textContent = '';
+            });
+
+            container.querySelectorAll('[data-del]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    playWoodSound();
+                    if (!confirm('确定要删除吗？')) return;
+                    const parts = this.dataset.del.split('|');
+                    const morphKey = parts[0] === '1' ? 'morph1' : 'morph2';
+                    const subKey = parts[1];
+                    const id = parts[2];
+                    const data = appData[morphKey];
+                    if (data && data[subKey]) {
+                        data[subKey] = data[subKey].filter(item => item.id !== id);
+                        saveAllData(appData);
+                        renderSubPage(morph, sub);
+                    }
+                });
+            });
+
+            container.querySelectorAll('[data-edit]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    playWoodSound();
+                    const parts = this.dataset.edit.split('|');
+                    const morphKey = parts[0] === '1' ? 'morph1' : 'morph2';
+                    const subKey = parts[1];
+                    const id = parts[2];
+                    const data = appData[morphKey];
+                    if (!data || !data[subKey]) return;
+                    const item = data[subKey].find(i => i.id === id);
+                    if (!item) return;
+                    const newText = prompt('编辑内容：', item.text || '');
+                    if (newText !== null && newText.trim() !== '') {
+                        item.text = newText.trim();
+                        saveAllData(appData);
+                        renderSubPage(morph, sub);
+                    }
+                });
+            });
+
+            container.querySelectorAll('.grid-item').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('grid-del-btn')) return;
+                    const img = this.querySelector('img');
+                    if (!img) return;
+                    playWoodSound();
+                    const allImgs = container.querySelectorAll('.grid-item img');
+                    viewerImages = Array.from(allImgs).map(i => i.src);
+                    viewerIndex = viewerImages.indexOf(img.src);
+                    document.getElementById('viewerImg').src = img.src;
+                    document.getElementById('viewerDesc').textContent = this.dataset.desc || '';
+                    document.getElementById('imageViewer').classList.add('open');
+                });
+            });
+        }
+
+        // ================================================================
+        // 事件绑定：共用子页面
+        // ================================================================
+        function bindSharedEvents(container, type) {
+            container.querySelector('[data-shared-back]')?.addEventListener('click', function() {
+                playWoodSound();
+                // ★★★ 移除 shared-mode ★★★
+                document.getElementById('page-home').classList.remove('shared-mode');
+                const homeMorphs = document.getElementById('home-morphs');
+                const homeShared = document.getElementById('home-shared');
+                if (homeMorphs) homeMorphs.style.display = '';
+                if (homeShared) homeShared.style.display = '';
+                container.innerHTML = '';
+                currentShared = null;
+            });
+
+            container.querySelector('[data-shared-upload]')?.addEventListener('click', function() {
+                playWoodSound();
+                currentShared = type;
+                document.getElementById('uploadModal').classList.add('open');
+                document.getElementById('uploadDesc').value = '';
+                document.getElementById('uploadFile').value = '';
+                document.getElementById('fileNameDisplay').textContent = '';
+            });
+
+            container.querySelectorAll('[data-shared-del]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    playWoodSound();
+                    if (!confirm('确定要删除吗？')) return;
+                    const parts = this.dataset.sharedDel.split('|');
+                    const t = parts[0];
+                    const id = parts[1];
+                    if (appData.shared && appData.shared[t]) {
+                        appData.shared[t] = appData.shared[t].filter(item => item.id !== id);
+                        saveAllData(appData);
+                        renderSharedPage(t);
+                    }
+                });
+            });
+
+            container.querySelectorAll('[data-shared-edit]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    playWoodSound();
+                    const parts = this.dataset.sharedEdit.split('|');
+                    const t = parts[0];
+                    const id = parts[1];
+                    if (!appData.shared || !appData.shared[t]) return;
+                    const item = appData.shared[t].find(i => i.id === id);
+                    if (!item) return;
+                    const newText = prompt('编辑内容：', item.text || '');
+                    if (newText !== null && newText.trim() !== '') {
+                        item.text = newText.trim();
+                        saveAllData(appData);
+                        renderSharedPage(t);
+                    }
+                });
+            });
+
+            container.querySelectorAll('.grid-item').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('grid-del-btn')) return;
+                    const img = this.querySelector('img');
+                    if (!img) return;
+                    playWoodSound();
+                    const allImgs = container.querySelectorAll('.grid-item img');
+                    viewerImages = Array.from(allImgs).map(i => i.src);
+                    viewerIndex = viewerImages.indexOf(img.src);
+                    document.getElementById('viewerImg').src = img.src;
+                    document.getElementById('viewerDesc').textContent = this.dataset.desc || '';
+                    document.getElementById('imageViewer').classList.add('open');
+                });
+            });
+        }
+
+        // ================================================================
+        // 查看器控制
+        // ================================================================
+        document.getElementById('viewerClose').addEventListener('click', function() {
+            playWoodSound();
+            document.getElementById('imageViewer').classList.remove('open');
+        });
+        document.getElementById('imageViewer').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('open');
+        });
+        document.getElementById('viewerPrev').addEventListener('click', function() {
+            if (viewerImages.length > 0) {
+                viewerIndex = (viewerIndex - 1 + viewerImages.length) % viewerImages.length;
+                document.getElementById('viewerImg').src = viewerImages[viewerIndex];
+                document.getElementById('viewerDesc').textContent = '';
+            }
+        });
+        document.getElementById('viewerNext').addEventListener('click', function() {
+            if (viewerImages.length > 0) {
+                viewerIndex = (viewerIndex + 1) % viewerImages.length;
+                document.getElementById('viewerImg').src = viewerImages[viewerIndex];
+                document.getElementById('viewerDesc').textContent = '';
+            }
+        });
+
+        // ================================================================
+        // 事件绑定
+        // ================================================================
+        document.querySelectorAll('.home-morph').forEach(el => {
+            el.addEventListener('click', function() {
+                playWoodSoundPage();
+                const morph = this.dataset.morph;
+                const sharedContainer = document.getElementById('shared-container');
+                if (sharedContainer) sharedContainer.innerHTML = '';
+                const homeMorphs = document.getElementById('home-morphs');
+                const homeShared = document.getElementById('home-shared');
+                if (homeMorphs) homeMorphs.style.display = '';
+                if (homeShared) homeShared.style.display = '';
+                currentShared = null;
+                // 移除 shared-mode
+                document.getElementById('page-home').classList.remove('shared-mode');
+
+                switchPage('page-morph' + morph);
+                currentMorph = morph;
+                setTimeout(() => setupQuestion(morph), 50);
+                const submit = document.getElementById('q-submit-' + morph);
+                const input = document.getElementById('q-input-' + morph);
+                if (submit) { submit.onclick = function() { handleQuestionSubmit(morph); }; }
+                if (input) { input.onkeydown = function(e) { if (e.key === 'Enter') handleQuestionSubmit(morph); }; }
+            });
+        });
+
+        document.querySelectorAll('.shared-btn').forEach(el => {
+            el.addEventListener('click', function() {
+                playWoodSound();
+                const type = this.dataset.shared;
+                renderSharedPage(type);
+            });
+        });
+
+        document.querySelectorAll('.morph-header .back-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                playWoodSoundPage();
+                switchPage('page-home');
+                document.querySelectorAll('#sub1-container, #sub2-container').forEach(c => c.innerHTML = '');
+                document.querySelectorAll('.btn-grid').forEach(el => el.style.display = '');
+                document.querySelectorAll('.question-area').forEach(el => el.style.display = '');
+            });
+        });
+
+        document.querySelectorAll('.morph-btn, .morph-btn-text').forEach(btn => {
+            btn.addEventListener('click', function() {
+                playWoodSound();
+                const sub = this.dataset.sub;
+                const morph = sub.slice(-1);
+                const subKey = sub.slice(0, -1);
+                currentMorph = morph;
+                currentSub = subKey;
+                currentShared = null;
+                renderSubPage(morph, subKey);
+            });
+        });
+
+        // ================================================================
+        // 上传弹窗
+        // ================================================================
+        document.getElementById('modalCancel').addEventListener('click', function() {
+            playWoodSound();
+            document.getElementById('uploadModal').classList.remove('open');
+        });
+        document.getElementById('uploadModal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('open');
+        });
+        document.getElementById('uploadFile').addEventListener('change', function() {
+            document.getElementById('fileNameDisplay').textContent = this.files[0] ? this.files[0].name : '';
+        });
+
+        document.getElementById('modalSubmit').addEventListener('click', function() {
+            playWoodSound();
+            const file = document.getElementById('uploadFile').files[0];
+            const desc = document.getElementById('uploadDesc').value.trim();
+            if (!file && !desc) {
+                alert('请上传图片或填写描述！');
+                return;
+            }
+
+            if (currentShared) {
+                const t = currentShared;
+                if (!appData.shared) appData.shared = { guzi: [], letter: [] };
+                if (!appData.shared[t]) appData.shared[t] = [];
+                const saveItem = (imgData) => {
+                    appData.shared[t].unshift({
+                        id: generateId(),
+                        type: imgData ? 'image' : 'text',
+                        text: desc || '无描述',
+                        img: imgData || '',
+                        date: getToday()
+                    });
+                    saveAllData(appData);
+                    document.getElementById('uploadModal').classList.remove('open');
+                    renderSharedPage(t);
+                    alert('✅ 上传成功！');
+                };
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) { saveItem(e.target.result); };
+                    reader.readAsDataURL(file);
+                } else {
+                    saveItem('');
+                }
+                return;
+            }
+
+            const morphKey = currentMorph === '1' ? 'morph1' : 'morph2';
+            const subKey = currentSub;
+            if (!appData[morphKey][subKey]) appData[morphKey][subKey] = [];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    appData[morphKey][subKey].unshift({
+                        id: generateId(),
+                        type: 'image',
+                        text: desc || '无描述',
+                        img: e.target.result,
+                        date: getToday()
+                    });
+                    saveAllData(appData);
+                    document.getElementById('uploadModal').classList.remove('open');
+                    renderSubPage(currentMorph, currentSub);
+                    alert('✅ 上传成功！');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                appData[morphKey][subKey].unshift({
+                    id: generateId(),
+                    type: 'text',
+                    text: desc,
+                    img: '',
+                    date: getToday()
+                });
+                saveAllData(appData);
+                document.getElementById('uploadModal').classList.remove('open');
+                renderSubPage(currentMorph, currentSub);
+                alert('✅ 上传成功！');
+            }
+        });
+
+        // ================================================================
+        // 启动
+        // ================================================================
+        (async () => {
+            switchPage('page-home');
+            await syncFromCloud();
+            console.log('🌸 恋语 · 双生 已加载');
+        })();
+    </script>
+</body>
+</html>
