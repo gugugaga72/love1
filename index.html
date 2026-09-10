@@ -1040,9 +1040,9 @@
 
     <script>
         // ============================================================
-        // ★★★ Supabase 配置（请替换为你自己的值）★★★
+        // ★★★ Supabase 配置（已填入你的密钥）★★★
         // ============================================================
-        const SUPABASE_URL = 'https://iujkturltzwxaoecushv.supabase.co'; 
+        const SUPABASE_URL = 'https://iujkturltzwxaoecushv.supabase.co';
         const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2KAsKSk5LZxbQn3uLdY5Uw_pgrNSrU9';
 
         // 初始化 Supabase 客户端
@@ -1161,15 +1161,15 @@
                     .from('handbook_data')
                     .select('content')
                     .order('updated_at', { ascending: false })
-                    .limit(1)
-                    .single();
+                    .limit(1);
                 
-                if (error || !data || !data.content) {
+                // 解决没数据时 406 报错的问题
+                if (error || !data || data.length === 0) {
                     console.log('📭 云端暂无数据');
                     return;
                 }
                 
-                const cloudData = data.content;
+                const cloudData = data[0].content;
                 if (cloudData && cloudData.morph1 && cloudData.morph2) {
                     const localTime = appData._updatedAt || 0;
                     const cloudTime = cloudData._updatedAt || 0;
@@ -1178,7 +1178,6 @@
                         appData = normalizeData(cloudData);
                         localStorage.setItem('handbook_data', JSON.stringify(appData));
                         console.log('✅ 已从 Supabase 同步最新数据');
-                        // 刷新页面以显示新数据
                         location.reload(); 
                     }
                 }
