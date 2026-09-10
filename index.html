@@ -854,6 +854,28 @@
             opacity: 0.5;
         }
 
+        /* ===== 管理模式按钮样式 ===== */
+        #admin-toggle {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 9999;
+            background: rgba(131, 47, 35, 0.85);
+            color: #f5ede4;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        #admin-toggle:active {
+            transform: scale(0.92);
+        }
+
         @media (max-width: 400px) {
             .app { border-radius: 16px; }
             .page { padding: 14px 12px 20px; }
@@ -1035,6 +1057,9 @@
 
     </div>
 
+    <!-- 🔒 管理模式开关 -->
+    <button id="admin-toggle">🔒 管理模式</button>
+
     <!-- 引入 Supabase JS 库 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1053,6 +1078,44 @@
                 return;
             }
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        }
+
+        // ================================================================
+        // ★★★ 管理员权限系统 ★★★
+        // ================================================================
+        const ADMIN_PASSWORD = '28214'; // 👈 管理员密码
+        let isAdmin = localStorage.getItem('handbook_isAdmin') === 'true';
+
+        function updateAdminButton() {
+            const btn = document.getElementById('admin-toggle');
+            if (!btn) return;
+            if (isAdmin) {
+                btn.innerHTML = '🔓 管理已解锁';
+                btn.style.background = 'rgba(60, 140, 60, 0.85)';
+            } else {
+                btn.innerHTML = '🔒 管理模式';
+                btn.style.background = 'rgba(131, 47, 35, 0.85)';
+            }
+        }
+
+        function toggleAdmin() {
+            if (isAdmin) {
+                if (confirm('确定要退出管理模式吗？退出后只能浏览，不能上传和删除。')) {
+                    isAdmin = false;
+                    localStorage.setItem('handbook_isAdmin', 'false');
+                    location.reload();
+                }
+            } else {
+                const pwd = prompt('请输入管理密码：');
+                if (pwd === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    localStorage.setItem('handbook_isAdmin', 'true');
+                    alert('🔓 管理已解锁，现在你可以上传和删除了');
+                    location.reload();
+                } else if (pwd !== null) {
+                    alert('❌ 密码错误，请重试');
+                }
+            }
         }
 
         // ================================================================
@@ -1448,7 +1511,7 @@
             html += `<div class="sub-header">
                         <button class="sub-back" data-morph="${morph}" data-sub="${sub}">‹</button>
                         <span class="sub-title">${title}</span>
-                        <button class="upload-fab" data-upload="${morph}|${sub}">✧ 上传</button>
+                        ${isAdmin ? `<button class="upload-fab" data-upload="${morph}|${sub}">✧ 上传</button>` : ''}
                      </div>`;
 
             if (isImageSub) {
@@ -1461,7 +1524,7 @@
                         html += `<div class="grid-item" data-img="${item.img}" data-desc="${item.text || ''}">
                                     <img src="${item.img}" alt="图片">
                                     <div class="grid-desc">${item.text || ''}</div>
-                                    <button class="grid-del-btn" data-del="${morph}|${sub}|${item.id}" title="删除">✕</button>
+                                    ${isAdmin ? `<button class="grid-del-btn" data-del="${morph}|${sub}|${item.id}" title="删除">✕</button>` : ''}
                                  </div>`;
                     } else {
                         html += `<div class="grid-item"><span class="empty-placeholder">空</span></div>`;
@@ -1486,7 +1549,7 @@
                                     <div class="doc-meta">
                                         <span>📅 ${item.date || ''}</span>
                                         <div class="doc-actions">
-                                            <button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>
+                                            ${isAdmin ? `<button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>` : ''}
                                         </div>
                                     </div>
                                  </div>`;
@@ -1496,8 +1559,8 @@
                                     <div class="doc-meta">
                                         <span>📅 ${item.date || ''}</span>
                                         <div class="doc-actions">
-                                            <button data-edit="${morph}|${sub}|${item.id}">✎ 编辑</button>
-                                            <button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>
+                                            ${isAdmin ? `<button data-edit="${morph}|${sub}|${item.id}">✎ 编辑</button>` : ''}
+                                            ${isAdmin ? `<button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>` : ''}
                                         </div>
                                     </div>
                                  </div>`;
@@ -1540,7 +1603,7 @@
             html += `<div class="sub-header">
                         <button class="sub-back" data-shared-back="1">‹</button>
                         <span class="sub-title">${title}</span>
-                        <button class="upload-fab" data-shared-upload="${type}">✧ 上传</button>
+                        ${isAdmin ? `<button class="upload-fab" data-shared-upload="${type}">✧ 上传</button>` : ''}
                      </div>`;
 
             if (isImageSub) {
@@ -1553,7 +1616,7 @@
                         html += `<div class="grid-item" data-img="${item.img}" data-desc="${item.text || ''}">
                                     <img src="${item.img}" alt="图片">
                                     <div class="grid-desc">${item.text || ''}</div>
-                                    <button class="grid-del-btn" data-shared-del="${type}|${item.id}" title="删除">✕</button>
+                                    ${isAdmin ? `<button class="grid-del-btn" data-shared-del="${type}|${item.id}" title="删除">✕</button>` : ''}
                                  </div>`;
                     } else {
                         html += `<div class="grid-item"><span class="empty-placeholder">空</span></div>`;
@@ -1569,8 +1632,8 @@
                                 <div class="doc-meta">
                                     <span>📅 ${item.date || ''}</span>
                                     <div class="doc-actions">
-                                        <button data-shared-edit="${type}|${item.id}">✎ 编辑</button>
-                                        <button data-shared-del="${type}|${item.id}">✕ 删除</button>
+                                        ${isAdmin ? `<button data-shared-edit="${type}|${item.id}">✎ 编辑</button>` : ''}
+                                        ${isAdmin ? `<button data-shared-del="${type}|${item.id}">✕ 删除</button>` : ''}
                                     </div>
                                 </div>
                              </div>`;
@@ -1912,6 +1975,10 @@
         // 启动
         // ================================================================
         (async () => {
+            // 绑定管理员按钮
+            document.getElementById('admin-toggle').addEventListener('click', toggleAdmin);
+            updateAdminButton();
+
             switchPage('page-home');
             await initSupabase();
             await syncFromCloud();
