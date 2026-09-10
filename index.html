@@ -61,7 +61,6 @@
         #page-home.active {
             display: flex;
         }
-        /* 共享模式：谷子/书信打开时 */
         #page-home.shared-mode {
             justify-content: flex-start;
             align-items: stretch;
@@ -120,7 +119,6 @@
             white-space: nowrap;
         }
 
-        /* 首页共用按钮 */
         .home-shared {
             width: 100%;
             display: grid;
@@ -170,7 +168,6 @@
             font-weight: bold;
         }
 
-        /* ===== 形态页面 ===== */
         .morph-page {
             background-size: cover;
             background-position: center;
@@ -217,7 +214,6 @@
             letter-spacing: 4px;
         }
 
-        /* ===== 形态页按钮排版 ===== */
         .btn-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -323,7 +319,6 @@
         .morph-btn-text .corner-tl { top: 6px; left: 8px; }
         .morph-btn-text .corner-br { bottom: 6px; right: 8px; }
 
-        /* ===== 问卷便签 ===== */
         .question-area {
             flex-shrink: 0;
             margin-top: 24px;
@@ -462,7 +457,6 @@
             letter-spacing: 2px;
         }
 
-        /* ===== 子页面 ===== */
         .sub-page {
             display: none;
             animation: slideIn 0.4s ease-out;
@@ -479,15 +473,18 @@
             margin-bottom: 16px;
         }
         .sub-page .sub-header .sub-back {
-            background: none;
-            border: none;
+            background: rgba(131, 47, 35, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: #f5ede4;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            padding: 4px 10px;
+            padding: 6px 16px;
             border-radius: 30px;
             transition: 0.2s;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(6px);
+            font-weight: bold;
         }
         .sub-page .sub-header .sub-back:active {
             transform: scale(0.85);
@@ -501,7 +498,6 @@
             font-weight: bold;
         }
 
-        /* ===== 3×3 九宫格 ===== */
         .grid-wrapper {
             max-height: 620px;
             overflow-y: auto;
@@ -560,7 +556,6 @@
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
-        /* 图片删除按钮 */
         .grid-item .grid-del-btn {
             position: absolute;
             top: 4px;
@@ -586,7 +581,6 @@
             background: rgba(131, 47, 35, 0.9);
         }
 
-        /* ===== 文稿卡片 ===== */
         .doc-item {
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(4px);
@@ -624,7 +618,6 @@
             opacity: 0.5;
         }
 
-        /* ===== 问答卡片 ===== */
         .doc-item.qna-item {
             background: rgba(0, 0, 0, 0.35);
         }
@@ -665,13 +658,13 @@
         }
 
         .upload-fab {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(131, 47, 35, 0.75);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 60px;
-            padding: 8px 18px;
+            padding: 8px 20px;
             color: #f5ede4;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-family: inherit;
             cursor: pointer;
             transition: 0.2s;
@@ -679,13 +672,15 @@
             align-items: center;
             gap: 6px;
             letter-spacing: 2px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
         }
         .upload-fab:active {
             transform: scale(0.92);
             opacity: 0.6;
         }
 
-        /* ===== 弹窗 ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -793,7 +788,6 @@
             opacity: 0.6;
         }
 
-        /* ===== 图片放大查看器 ===== */
         .image-viewer {
             display: none;
             position: fixed;
@@ -1043,19 +1037,11 @@
 
     <script>
         // ============================================================
-        // ★★★ 云端同步配置（jsonbin.io） ★★★
-        //
-        // 使用步骤：
-        // 1. 打开 https://jsonbin.io 注册（免费）
-        // 2. 登录后点 "Create Bin"，内容填 {} 保存
-        // 3. 复制 Bin ID（URL 里 /b/ 后面那一串）
-        // 4. 点右上角头像 → "API Keys" → 复制 X-Master-Key
-        // 5. 把下面两个值填进去，enabled 改为 true
+        // ★★★ BrewPage 配置（无需注册，只需设置一个命名空间）★★★
         // ============================================================
-        const JSONBIN_CONFIG = {
-            binId: '',         // 例：'65f1a2b3c4d5e6f7a8b9c0d1'
-            masterKey: '',     // 例：'$2a$10$abcdefg...'
-            enabled: false     // 填好后改为 true
+        const BREWPAGE_CONFIG = {
+            namespace: 'love-handbook', // 你可以改成任何你喜欢的名字，只用字母数字横线
+            baseUrl: 'https://brewpage.app'
         };
 
         // ================================================================
@@ -1146,7 +1132,7 @@
         ];
 
         // ================================================================
-        // ★★★ 空数据 ★★★
+        // 空数据
         // ================================================================
         const DEFAULT_DATA = {
             morph1: { album: [], reality: [], ifline: [] },
@@ -1155,22 +1141,19 @@
         };
 
         // ================================================================
-        // ★★★ 云端同步函数 ★★★
+        // BrewPage 云端同步
         // ================================================================
         async function syncFromCloud() {
-            if (!JSONBIN_CONFIG.enabled) return;
-            if (!JSONBIN_CONFIG.binId || !JSONBIN_CONFIG.masterKey) {
-                console.log('⚠️ jsonbin 配置未填写，跳过云端同步');
-                return;
-            }
+            if (!BREWPAGE_CONFIG.namespace) return;
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.binId}/latest`, {
-                    headers: {
-                        'X-Master-Key': JSONBIN_CONFIG.masterKey,
-                        'X-Bin-Meta': 'false'
-                    }
+                const res = await fetch(`${BREWPAGE_CONFIG.baseUrl}/api/files/${BREWPAGE_CONFIG.namespace}`, {
+                    headers: { 'Accept': 'application/json' }
                 });
                 if (!res.ok) {
+                    if (res.status === 404) {
+                        console.log('📭 云端暂无数据，等待首次上传');
+                        return;
+                    }
                     console.log('云端拉取失败：', res.status);
                     return;
                 }
@@ -1181,12 +1164,8 @@
                     if (cloudTime > localTime) {
                         appData = normalizeData(cloudData);
                         localStorage.setItem('handbook_data', JSON.stringify(appData));
-                        console.log('✅ 已从云端同步最新数据');
-                    } else if (localTime > cloudTime) {
-                        pushToCloud(appData);
+                        console.log('✅ 已从 BrewPage 同步最新数据');
                     }
-                } else {
-                    pushToCloud(appData);
                 }
             } catch (e) {
                 console.log('云端同步异常：', e);
@@ -1194,24 +1173,31 @@
         }
 
         async function pushToCloud(data) {
-            if (!JSONBIN_CONFIG.enabled) return;
-            if (!JSONBIN_CONFIG.binId || !JSONBIN_CONFIG.masterKey) return;
+            if (!BREWPAGE_CONFIG.namespace) {
+                console.log('⚠️ 未设置命名空间，跳过云端同步');
+                return;
+            }
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.binId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_CONFIG.masterKey
-                    },
-                    body: JSON.stringify(data)
+                const jsonString = JSON.stringify(data);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const formData = new FormData();
+                formData.append('namespace', BREWPAGE_CONFIG.namespace);
+                formData.append('file', blob, 'handbook_data.json');
+                const res = await fetch(`${BREWPAGE_CONFIG.baseUrl}/api/files/uploads`, {
+                    method: 'POST',
+                    body: formData
                 });
-                if (res.ok) {
-                    console.log('✅ 已同步到云端');
-                } else {
-                    console.log('云端推送失败：', res.status);
+                if (!res.ok) {
+                    console.log('云端上传失败：', res.status);
+                    return;
                 }
+                const result = await res.json();
+                if (result.ownerToken) {
+                    localStorage.setItem('brewpage_owner_token', result.ownerToken);
+                }
+                console.log('✅ 已同步到 BrewPage');
             } catch (e) {
-                console.log('云端推送异常：', e);
+                console.log('云端同步异常：', e);
             }
         }
 
@@ -1532,7 +1518,6 @@
             const container = document.getElementById('shared-container');
             if (!container) return;
 
-            // ★★★ 给首页加 shared-mode ★★★
             document.getElementById('page-home').classList.add('shared-mode');
 
             const homeMorphs = document.getElementById('home-morphs');
@@ -1685,7 +1670,6 @@
         function bindSharedEvents(container, type) {
             container.querySelector('[data-shared-back]')?.addEventListener('click', function() {
                 playWoodSound();
-                // ★★★ 移除 shared-mode ★★★
                 document.getElementById('page-home').classList.remove('shared-mode');
                 const homeMorphs = document.getElementById('home-morphs');
                 const homeShared = document.getElementById('home-shared');
@@ -1794,7 +1778,6 @@
                 if (homeMorphs) homeMorphs.style.display = '';
                 if (homeShared) homeShared.style.display = '';
                 currentShared = null;
-                // 移除 shared-mode
                 document.getElementById('page-home').classList.remove('shared-mode');
 
                 switchPage('page-morph' + morph);
