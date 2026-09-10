@@ -1035,14 +1035,25 @@
 
     </div>
 
+    <!-- 引入 Supabase JS 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         // ============================================================
-        // ★★★ BrewPage 配置（无需注册，只需设置一个命名空间）★★★
+        // ★★★ Supabase 配置（请替换为你自己的值）★★★
         // ============================================================
-        const BREWPAGE_CONFIG = {
-            namespace: 'love-handbook', // 你可以改成任何你喜欢的名字，只用字母数字横线
-            baseUrl: 'https://brewpage.app'
-        };
+        const SUPABASE_URL = '这里粘贴你的Project URL'; 
+        const SUPABASE_PUBLISHABLE_KEY = '这里粘贴你的Publishable key (sb_publishable_...)';
+
+        // 初始化 Supabase 客户端
+        let supabaseClient = null;
+        async function initSupabase() {
+            if (typeof window.supabase === 'undefined') {
+                console.log('⚠️ Supabase 库未加载，请检查网络');
+                return;
+            }
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        }
 
         // ================================================================
         // ★★★ 木质叩击音效 ★★★
@@ -1141,30 +1152,34 @@
         };
 
         // ================================================================
-        // BrewPage 云端同步
+        // Supabase 云端同步
         // ================================================================
         async function syncFromCloud() {
-            if (!BREWPAGE_CONFIG.namespace) return;
+            if (!supabaseClient) return;
             try {
-                const res = await fetch(`${BREWPAGE_CONFIG.baseUrl}/api/files/${BREWPAGE_CONFIG.namespace}`, {
-                    headers: { 'Accept': 'application/json' }
-                });
-                if (!res.ok) {
-                    if (res.status === 404) {
-                        console.log('📭 云端暂无数据，等待首次上传');
-                        return;
-                    }
-                    console.log('云端拉取失败：', res.status);
+                const { data, error } = await supabaseClient
+                    .from('handbook_data')
+                    .select('content')
+                    .order('updated_at', { ascending: false })
+                    .limit(1)
+                    .single();
+                
+                if (error || !data || !data.content) {
+                    console.log('📭 云端暂无数据');
                     return;
                 }
-                const cloudData = await res.json();
+                
+                const cloudData = data.content;
                 if (cloudData && cloudData.morph1 && cloudData.morph2) {
                     const localTime = appData._updatedAt || 0;
                     const cloudTime = cloudData._updatedAt || 0;
+                    
                     if (cloudTime > localTime) {
                         appData = normalizeData(cloudData);
                         localStorage.setItem('handbook_data', JSON.stringify(appData));
-                        console.log('✅ 已从 BrewPage 同步最新数据');
+                        console.log('✅ 已从 Supabase 同步最新数据');
+                        // 刷新页面以显示新数据
+                        location.reload(); 
                     }
                 }
             } catch (e) {
@@ -1173,29 +1188,17 @@
         }
 
         async function pushToCloud(data) {
-            if (!BREWPAGE_CONFIG.namespace) {
-                console.log('⚠️ 未设置命名空间，跳过云端同步');
-                return;
-            }
+            if (!supabaseClient) return;
             try {
-                const jsonString = JSON.stringify(data);
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const formData = new FormData();
-                formData.append('namespace', BREWPAGE_CONFIG.namespace);
-                formData.append('file', blob, 'handbook_data.json');
-                const res = await fetch(`${BREWPAGE_CONFIG.baseUrl}/api/files/uploads`, {
-                    method: 'POST',
-                    body: formData
-                });
-                if (!res.ok) {
-                    console.log('云端上传失败：', res.status);
-                    return;
+                const { error } = await supabaseClient
+                    .from('handbook_data')
+                    .insert([{ content: data }]);
+                
+                if (error) {
+                    console.log('云端上传失败：', error.message);
+                } else {
+                    console.log('✅ 已同步到 Supabase');
                 }
-                const result = await res.json();
-                if (result.ownerToken) {
-                    localStorage.setItem('brewpage_owner_token', result.ownerToken);
-                }
-                console.log('✅ 已同步到 BrewPage');
             } catch (e) {
                 console.log('云端同步异常：', e);
             }
@@ -1911,6 +1914,7 @@
         // ================================================================
         (async () => {
             switchPage('page-home');
+            await initSupabase();
             await syncFromCloud();
             console.log('🌸 恋语 · 双生 已加载');
         })();
