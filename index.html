@@ -590,18 +590,11 @@
         async function pushToCloud(data) {
             if (!supabaseClient) return false;
             try {
+                // 注意：这里只存轻量的文字/链接，图片不再存Base64，所以绝对不会体积超限
                 const { error } = await supabaseClient.from('handbook_data').insert([{ content: data }]);
-                if (error) { 
-                    console.log('云端上传失败：', error.message); 
-                    return false;
-                } else { 
-                    console.log('✅ 已同步到 Supabase'); 
-                    return true;
-                }
-            } catch (e) { 
-                console.log('云端同步异常：', e); 
-                return false;
-            }
+                if (error) { console.log('云端上传失败：', error.message); return false; } 
+                else { console.log('✅ 已同步到 Supabase'); return true; }
+            } catch (e) { console.log('云端同步异常：', e); return false; }
         }
 
         // ================================================================
@@ -645,8 +638,8 @@
 
         function saveAllData(data) {
             data._updatedAt = Date.now();
+            // 因为图片已经变成了链接，本地存储几乎不占空间，可以放心存
             localStorage.setItem('handbook_data', JSON.stringify(data));
-            // 返回云端同步的 Promise
             return pushToCloud(data);
         }
 
@@ -887,7 +880,7 @@
         document.querySelectorAll('.morph-btn, .morph-btn-text').forEach(btn => { btn.addEventListener('click', function() { playWoodSound(); const sub = this.dataset.sub, morph = sub.slice(-1), subKey = sub.slice(0, -1); currentMorph = morph; currentSub = subKey; currentShared = null; renderSubPage(morph, subKey); }); });
 
         // ================================================================
-        // ★★★ 上传弹窗（安卓专属稳健版，减少崩溃概率） ★★★
+        // ★★★ 上传弹窗（改成Storage上传） ★★★
         // ================================================================
         document.getElementById('modalCancel').addEventListener('click', function() { playWoodSound(); document.getElementById('uploadModal').classList.remove('open'); });
         document.getElementById('uploadModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
@@ -895,42 +888,6 @@
             const count = this.files.length;
             document.getElementById('fileNameDisplay').textContent = count > 0 ? `已选 ${count} 张图片` : '';
         });
-
-        // 针对安卓的温和压缩函数：仅压缩大图，不处理小图，以防止内存溢出
-        function safeCompress(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = function() {
-                        try {
-                            let width = img.width, height = img.height;
-                            const MAX_DIM = 600; // 大幅缩小，防止安卓内存溢出
-                            if (width > MAX_DIM || height > MAX_DIM) {
-                                if (width > height) { height = Math.round((MAX_DIM / width) * height); width = MAX_DIM; }
-                                else { width = Math.round((MAX_DIM / height) * width); height = MAX_DIM; }
-                            }
-                            const canvas = document.createElement('canvas');
-                            canvas.width = width; canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.fillStyle = '#FFFFFF';
-                            ctx.fillRect(0, 0, width, height);
-                            ctx.drawImage(img, 0, 0, width, height);
-                            // 直接使用 0.6 的质量，保证体积足够小
-                            const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                            if (!dataUrl || dataUrl === 'data:,') throw new Error("解析失败");
-                            resolve(dataUrl);
-                        } catch (err) {
-                            reject(new Error("图片格式不支持，请截图后再上传"));
-                        }
-                    };
-                    img.onerror = () => reject(new Error("图片无法识别，请截图后再上传"));
-                };
-                reader.onerror = () => reject(new Error("读取文件失败"));
-            });
-        }
 
         document.getElementById('modalSubmit').addEventListener('click', async function() {
             playWoodSound();
@@ -954,28 +911,42 @@
 
                 if (files.length > 0) {
                     for (let i = 0; i < files.length; i++) {
-                        submitBtn.textContent = `处理 ${i+1}/${files.length}...`;
+                        submitBtn.textContent = `上传 ${i+1}/${files.length}...`;
                         try {
-                            // 严格拦截过大图片（大于3MB），防止安卓手机直接崩溃
-                            if (files[i].size > 3 * 1024 * 1024) {
-                                throw new Error(`图片超过3MB（${(files[i].size/1024/1024).toFixed(1)}MB），手机处理会崩溃。请在相册中截图后再上传！`);
-                            }
+                            // 1. 生成唯一文件名，防止覆盖
+                            const fileExt = files[i].name.split('.').pop() || 'jpg';
+                            const fileName = `images/${Date.now()}_${Math.random().toString(36).substr(2, 6)}.${fileExt}`;
                             
-                            const compressedImg = await safeCompress(files[i]);
+                            // 2. 上传到 Supabase Storage
+                            const { data, error } = await supabaseClient.storage
+                                .from('images')
+                                .upload(fileName, files[i], {
+                                    cacheControl: '3600',
+                                    upsert: false
+                                });
+
+                            if (error) throw new Error('网盘上传失败：' + error.message);
+
+                            // 3. 获取公共访问链接
+                            const { data: urlData } = supabaseClient.storage
+                                .from('images')
+                                .getPublicUrl(fileName);
+                                
+                            const publicUrl = urlData.publicUrl;
+
+                            // 4. 把链接写入数据库数组
                             appData[targetKey][subKey].unshift({
                                 id: generateId(),
                                 type: 'image',
                                 text: desc || '无描述',
-                                img: compressedImg,
+                                img: publicUrl, // 这里存的是网络链接，不是Base64！
                                 date: getToday()
                             });
                             successCount++;
-                            // 实时保存到本地，防止中途应用崩溃导致全部丢失
-                            localStorage.setItem('handbook_data', JSON.stringify(appData));
+                            localStorage.setItem('handbook_data', JSON.stringify(appData)); // 实时保存到本地
                         } catch (err) {
                             failCount++;
                             console.error(`第${i+1}张失败`, err);
-                            alert(`第 ${i+1} 张图片失败：${err.message}`);
                         }
                     }
                 } else {
@@ -990,7 +961,7 @@
                 }
 
                 if (successCount > 0 || (files.length === 0 && desc)) {
-                    submitBtn.textContent = '同步云端...';
+                    submitBtn.textContent = '同步数据...';
                     const cloudSuccess = await saveAllData(appData);
                     
                     document.getElementById('uploadModal').classList.remove('open');
@@ -1004,13 +975,15 @@
                         renderSubPage(currentMorph, currentSub);
                     }
                     
-                    if (cloudSuccess) {
-                        alert(`✅ 成功上传 ${successCount} 张！云端已同步。`);
+                    if (failCount > 0) {
+                        alert(`⚠️ 完成：${successCount} 张成功，${failCount} 张失败。请检查图片格式。`);
+                    } else if (cloudSuccess) {
+                        alert(`✅ 成功上传 ${successCount} 张！`);
                     } else {
-                        alert(`⚠️ 已保存在本地（${successCount}张），但云端同步失败。请检查：\n1. Supabase 是否被暂停\n2. 手机网络是否稳定`);
+                        alert(`⚠️ 已上传网盘并保存在本地，但文字数据云端同步失败。`);
                     }
                 } else {
-                    alert('❌ 所有图片都处理失败。\n建议：在手机相册里截图后，再上传截图（截图通常只有几百KB，绝对能成功）。');
+                    alert('❌ 所有图片都上传失败。\n可能是：\n1. Storage 的 images 桶没建好\n2. 桶权限没设置对\n3. 图片格式不支持，请截图后再传');
                 }
             } catch (e) {
                 console.error(e);
