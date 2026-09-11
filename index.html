@@ -223,6 +223,7 @@
         .modal-actions button { flex: 1; padding: 10px; border: none; border-radius: 40px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit; }
         .modal-actions .btn-submit { background: #832F23; color: #fff; }
         .modal-actions .btn-submit:active { transform: scale(0.94); opacity: 0.7; }
+        .modal-actions .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
         .modal-actions .btn-cancel { background: #e8ddd0; color: #3E2D45; }
         .modal-actions .btn-cancel:active { transform: scale(0.94); opacity: 0.6; }
 
@@ -587,11 +588,20 @@
         }
 
         async function pushToCloud(data) {
-            if (!supabaseClient) return;
+            if (!supabaseClient) return false;
             try {
                 const { error } = await supabaseClient.from('handbook_data').insert([{ content: data }]);
-                if (error) { console.log('云端上传失败：', error.message); } else { console.log('✅ 已同步到 Supabase'); }
-            } catch (e) { console.log('云端同步异常：', e); }
+                if (error) { 
+                    console.log('云端上传失败：', error.message); 
+                    return false;
+                } else { 
+                    console.log('✅ 已同步到 Supabase'); 
+                    return true;
+                }
+            } catch (e) { 
+                console.log('云端同步异常：', e); 
+                return false;
+            }
         }
 
         // ================================================================
@@ -636,7 +646,8 @@
         function saveAllData(data) {
             data._updatedAt = Date.now();
             localStorage.setItem('handbook_data', JSON.stringify(data));
-            pushToCloud(data);
+            // 返回云端同步的 Promise，方便外部捕捉状态
+            return pushToCloud(data);
         }
 
         let appData = loadAllData();
@@ -876,7 +887,7 @@
         document.querySelectorAll('.morph-btn, .morph-btn-text').forEach(btn => { btn.addEventListener('click', function() { playWoodSound(); const sub = this.dataset.sub, morph = sub.slice(-1), subKey = sub.slice(0, -1); currentMorph = morph; currentSub = subKey; currentShared = null; renderSubPage(morph, subKey); }); });
 
         // ================================================================
-        // 上传弹窗（核心修改：智能逐张压缩逻辑）
+        // ★★★ 上传弹窗（针对安卓深度优化版） ★★★
         // ================================================================
         document.getElementById('modalCancel').addEventListener('click', function() { playWoodSound(); document.getElementById('uploadModal').classList.remove('open'); });
         document.getElementById('uploadModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
@@ -885,49 +896,57 @@
             document.getElementById('fileNameDisplay').textContent = count > 0 ? `已选 ${count} 张图片` : '';
         });
 
-        // 智能压缩函数：根据文件大小，自动调节压缩比例
-        function smartCompress(file, maxSizeKB = 150) {
+        // 针对安卓的稳健压缩函数（异步、低内存、错误捕获）
+        function safeCompress(file, maxSizeKB = 200) {
             return new Promise((resolve, reject) => {
+                // 优先读取文件大小，如果文件实在太大（比如10MB），先给个警告或上限
+                if (file.size > 10 * 1024 * 1024) {
+                    console.warn("图片超过10MB，尝试压缩但可能较慢");
+                }
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = function(e) {
                     const img = new Image();
                     img.src = e.target.result;
                     img.onload = function() {
-                        let width = img.width;
-                        let height = img.height;
-                        // 先缩放尺寸
-                        const MAX_DIM = 1000;
-                        if (width > MAX_DIM || height > MAX_DIM) {
-                            if (width > height) { height = Math.round((MAX_DIM / width) * height); width = MAX_DIM; }
-                            else { width = Math.round((MAX_DIM / height) * width); height = MAX_DIM; }
-                        }
-                        const canvas = document.createElement('canvas');
-                        canvas.width = width; canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
+                        try {
+                            let width = img.width, height = img.height;
+                            // 设定最大边长，防止安卓内存溢出（设为 800 像素，对手机查看已经很清晰）
+                            const MAX_DIM = 800;
+                            if (width > MAX_DIM || height > MAX_DIM) {
+                                if (width > height) { height = Math.round((MAX_DIM / width) * height); width = MAX_DIM; }
+                                else { width = Math.round((MAX_DIM / height) * width); height = MAX_DIM; }
+                            }
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width; canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            // 用白色背景填充，防止透明图变黑
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(0, 0, width, height);
+                            ctx.drawImage(img, 0, 0, width, height);
 
-                        let quality = 0.8;
-                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
-
-                        // 如果还是太大，继续降低质量和尺寸
-                        while (dataUrl.length / 1024 > maxSizeKB && quality > 0.3) {
-                            quality -= 0.1;
-                            dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            let quality = 0.8;
+                            let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            
+                            // 针对安卓更狠的压缩：如果超过 200KB，直接降质到 0.6
+                            if (dataUrl.length / 1024 > maxSizeKB) {
+                                quality = 0.6;
+                                dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            }
+                            // 如果还是太大，降质到 0.4
+                            if (dataUrl.length / 1024 > maxSizeKB) {
+                                quality = 0.4;
+                                dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            }
+                            console.log(`压缩完成: ${(file.size/1024).toFixed(0)}KB -> ${(dataUrl.length/1024).toFixed(0)}KB`);
+                            resolve(dataUrl);
+                        } catch (err) {
+                            reject(new Error('图片解析失败，请尝试更换图片格式（如截图后再上传）'));
                         }
-                        // 如果还是太大，把尺寸砍半
-                        if (dataUrl.length / 1024 > maxSizeKB) {
-                            canvas.width = Math.round(width * 0.7);
-                            canvas.height = Math.round(height * 0.7);
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                        }
-                        console.log(`图片压缩完成: ${(file.size/1024).toFixed(0)}KB -> ${(dataUrl.length/1024).toFixed(0)}KB`);
-                        resolve(dataUrl);
                     };
-                    img.onerror = reject;
+                    img.onerror = () => reject(new Error('图片格式不被安卓支持，请尝试截图后再上传'));
                 };
-                reader.onerror = reject;
+                reader.onerror = () => reject(new Error('无法读取文件'));
             });
         }
 
@@ -941,7 +960,7 @@
 
             const submitBtn = this;
             submitBtn.disabled = true;
-            submitBtn.textContent = '准备中...';
+            submitBtn.textContent = '处理中...';
 
             try {
                 const targetKey = currentShared ? 'shared' : (currentMorph === '1' ? 'morph1' : 'morph2');
@@ -949,11 +968,10 @@
                 if (!appData[targetKey][subKey]) appData[targetKey][subKey] = [];
 
                 if (files.length > 0) {
-                    // 循环逐张处理，避免内存崩溃和请求过大
                     for (let i = 0; i < files.length; i++) {
-                        submitBtn.textContent = `压缩第 ${i+1}/${files.length} 张...`;
+                        submitBtn.textContent = `压缩 ${i+1}/${files.length}...`;
                         try {
-                            const compressedImg = await smartCompress(files[i]);
+                            const compressedImg = await safeCompress(files[i]);
                             appData[targetKey][subKey].unshift({
                                 id: generateId(),
                                 type: 'image',
@@ -962,7 +980,8 @@
                                 date: getToday()
                             });
                         } catch (err) {
-                            console.error("第" + (i+1) + "张图片处理失败", err);
+                            console.error("第" + (i+1) + "张失败", err);
+                            alert(`第 ${i+1} 张图片处理失败：${err.message}\n建议直接在相册里截图，截图后上传。`);
                         }
                     }
                 } else {
@@ -975,8 +994,8 @@
                     });
                 }
 
-                submitBtn.textContent = '保存数据...';
-                saveAllData(appData);
+                submitBtn.textContent = '同步云端...';
+                const cloudSuccess = await saveAllData(appData); // 拿到云端同步结果
                 
                 document.getElementById('uploadModal').classList.remove('open');
                 document.getElementById('uploadDesc').value = '';
@@ -988,10 +1007,15 @@
                 } else {
                     renderSubPage(currentMorph, currentSub);
                 }
-                alert('✅ 上传成功！');
+                
+                if (cloudSuccess) {
+                    alert('✅ 上传并同步云端成功！');
+                } else {
+                    alert('⚠️ 已保存在本地，但云端同步失败。\n请检查：\n1. Supabase 项目是否被暂停\n2. 手机网络是否稳定\n3. 是否在微信里直接打开（请换系统浏览器）');
+                }
             } catch (e) {
                 console.error(e);
-                alert('上传失败，请重试！');
+                alert('❌ 上传失败：' + e.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '确认上传';
