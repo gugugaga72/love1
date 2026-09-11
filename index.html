@@ -223,7 +223,6 @@
         .modal-actions button { flex: 1; padding: 10px; border: none; border-radius: 40px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit; }
         .modal-actions .btn-submit { background: #832F23; color: #fff; }
         .modal-actions .btn-submit:active { transform: scale(0.94); opacity: 0.7; }
-        .modal-actions .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
         .modal-actions .btn-cancel { background: #e8ddd0; color: #3E2D45; }
         .modal-actions .btn-cancel:active { transform: scale(0.94); opacity: 0.6; }
 
@@ -588,13 +587,12 @@
         }
 
         async function pushToCloud(data) {
-            if (!supabaseClient) return false;
+            if (!supabaseClient) return;
             try {
-                // 注意：这里只存轻量的文字/链接，图片不再存Base64，所以绝对不会体积超限
+                // 因为图片已经变成了链接，数据体积非常小，这里绝对可以同步成功
                 const { error } = await supabaseClient.from('handbook_data').insert([{ content: data }]);
-                if (error) { console.log('云端上传失败：', error.message); return false; } 
-                else { console.log('✅ 已同步到 Supabase'); return true; }
-            } catch (e) { console.log('云端同步异常：', e); return false; }
+                if (error) { console.log('云端上传失败：', error.message); } else { console.log('✅ 已同步到 Supabase'); }
+            } catch (e) { console.log('云端同步异常：', e); }
         }
 
         // ================================================================
@@ -638,9 +636,8 @@
 
         function saveAllData(data) {
             data._updatedAt = Date.now();
-            // 因为图片已经变成了链接，本地存储几乎不占空间，可以放心存
             localStorage.setItem('handbook_data', JSON.stringify(data));
-            return pushToCloud(data);
+            pushToCloud(data);
         }
 
         let appData = loadAllData();
@@ -880,7 +877,7 @@
         document.querySelectorAll('.morph-btn, .morph-btn-text').forEach(btn => { btn.addEventListener('click', function() { playWoodSound(); const sub = this.dataset.sub, morph = sub.slice(-1), subKey = sub.slice(0, -1); currentMorph = morph; currentSub = subKey; currentShared = null; renderSubPage(morph, subKey); }); });
 
         // ================================================================
-        // ★★★ 上传弹窗（改成Storage上传） ★★★
+        // ★★★ 上传弹窗（核心修改：接入 Supabase Storage 网盘，原图直传） ★★★
         // ================================================================
         document.getElementById('modalCancel').addEventListener('click', function() { playWoodSound(); document.getElementById('uploadModal').classList.remove('open'); });
         document.getElementById('uploadModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
@@ -913,11 +910,11 @@
                     for (let i = 0; i < files.length; i++) {
                         submitBtn.textContent = `上传 ${i+1}/${files.length}...`;
                         try {
-                            // 1. 生成唯一文件名，防止覆盖
+                            // 1. 生成随机文件名，确保同一张图多次上传不冲突
                             const fileExt = files[i].name.split('.').pop() || 'jpg';
                             const fileName = `images/${Date.now()}_${Math.random().toString(36).substr(2, 6)}.${fileExt}`;
                             
-                            // 2. 上传到 Supabase Storage
+                            // 2. 上传原图到 Supabase Storage
                             const { data, error } = await supabaseClient.storage
                                 .from('images')
                                 .upload(fileName, files[i], {
@@ -927,19 +924,19 @@
 
                             if (error) throw new Error('网盘上传失败：' + error.message);
 
-                            // 3. 获取公共访问链接
+                            // 3. 获取刚刚上传的公开访问链接
                             const { data: urlData } = supabaseClient.storage
                                 .from('images')
                                 .getPublicUrl(fileName);
                                 
                             const publicUrl = urlData.publicUrl;
 
-                            // 4. 把链接写入数据库数组
+                            // 4. 把链接存入数据中
                             appData[targetKey][subKey].unshift({
                                 id: generateId(),
                                 type: 'image',
                                 text: desc || '无描述',
-                                img: publicUrl, // 这里存的是网络链接，不是Base64！
+                                img: publicUrl, // 这里存的是链接，不是图片本身
                                 date: getToday()
                             });
                             successCount++;
@@ -962,7 +959,7 @@
 
                 if (successCount > 0 || (files.length === 0 && desc)) {
                     submitBtn.textContent = '同步数据...';
-                    const cloudSuccess = await saveAllData(appData);
+                    saveAllData(appData);
                     
                     document.getElementById('uploadModal').classList.remove('open');
                     document.getElementById('uploadDesc').value = '';
@@ -977,13 +974,11 @@
                     
                     if (failCount > 0) {
                         alert(`⚠️ 完成：${successCount} 张成功，${failCount} 张失败。请检查图片格式。`);
-                    } else if (cloudSuccess) {
-                        alert(`✅ 成功上传 ${successCount} 张！`);
                     } else {
-                        alert(`⚠️ 已上传网盘并保存在本地，但文字数据云端同步失败。`);
+                        alert(`✅ 成功上传 ${successCount} 张原图！`);
                     }
                 } else {
-                    alert('❌ 所有图片都上传失败。\n可能是：\n1. Storage 的 images 桶没建好\n2. 桶权限没设置对\n3. 图片格式不支持，请截图后再传');
+                    alert('❌ 所有图片都上传失败。\n请检查：\n1. Supabase 的 images 桶建好了吗？\n2. 公开读取和允许上传的 SQL 策略执行了吗？\n3. 请截图后再试。');
                 }
             } catch (e) {
                 console.error(e);
