@@ -6,898 +6,255 @@
     <title>恋语 · 双生</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Georgia', 'Times New Roman', 'Noto Serif SC', serif;
-            background: #1a1410;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
+            background: #1a1410; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px;
         }
         .app {
-            width: 100%;
-            max-width: 480px;
-            background: #f5ede4;
-            border-radius: 28px;
-            overflow: hidden;
-            position: relative;
-            min-height: 780px;
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+            width: 100%; max-width: 480px; background: #f5ede4; border-radius: 28px; overflow: hidden;
+            position: relative; min-height: 780px; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
         }
-        .page {
-            display: none;
-            padding: 20px 16px 30px;
-            min-height: 780px;
-            position: relative;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .page.active {
-            display: block;
-            animation: slideIn 0.5s ease-out;
-        }
-        @keyframes slideIn {
-            0% { opacity: 0.4; transform: translateX(30px); }
-            100% { opacity: 1; transform: translateX(0); }
-        }
+        .page { display: none; padding: 20px 16px 30px; min-height: 780px; position: relative; width: 100%; box-sizing: border-box; }
+        .page.active { display: block; animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn { 0% { opacity: 0.4; transform: translateX(30px); } 100% { opacity: 1; transform: translateX(0); } }
 
         /* ===== 首页 ===== */
         #page-home {
-            background: #f5ede4;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 18px;
-            padding: 30px 20px;
-            min-height: 780px;
+            background: #f5ede4; display: none; flex-direction: column; justify-content: center;
+            align-items: center; gap: 18px; padding: 30px 20px; min-height: 780px;
         }
-        #page-home.active {
-            display: flex;
-        }
-        #page-home.shared-mode {
-            justify-content: flex-start;
-            align-items: stretch;
-            padding: 20px 16px 30px;
-        }
-        #page-home.shared-mode .home-morphs,
-        #page-home.shared-mode .home-shared {
-            display: none !important;
-        }
-        #shared-container {
-            width: 100%;
-            box-sizing: border-box;
-        }
-        #page-home.shared-mode #shared-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .home-morphs {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
+        #page-home.active { display: flex; }
+        #page-home.shared-mode { justify-content: flex-start; align-items: stretch; padding: 20px 16px 30px; }
+        #page-home.shared-mode .home-morphs, #page-home.shared-mode .home-shared { display: none !important; }
+        #shared-container { width: 100%; box-sizing: border-box; }
+        #page-home.shared-mode #shared-container { flex: 1; display: flex; flex-direction: column; }
+        .home-morphs { width: 100%; display: flex; flex-direction: column; gap: 18px; }
         .home-morph {
-            width: 100%;
-            border-radius: 24px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            position: relative;
+            width: 100%; border-radius: 24px; overflow: hidden; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); position: relative;
         }
-        .home-morph:active {
-            transform: scale(0.94);
-            opacity: 0.7;
-        }
-        .home-morph img {
-            width: 100%;
-            display: block;
-        }
+        .home-morph:active { transform: scale(0.94); opacity: 0.7; }
+        .home-morph img { width: 100%; display: block; }
         .home-morph .morph-label {
-            position: absolute;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(6px);
-            color: #f5ede4;
-            padding: 6px 24px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            letter-spacing: 3px;
-            font-weight: bold;
-            white-space: nowrap;
+            position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(6px); color: #f5ede4;
+            padding: 6px 24px; border-radius: 40px; font-size: 0.9rem; letter-spacing: 3px;
+            font-weight: bold; white-space: nowrap;
         }
-
-        .home-shared {
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-top: 4px;
-        }
+        .home-shared { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px; }
         .shared-btn {
-            border: none;
-            border-radius: 0;
-            overflow: visible;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: none;
-            background: transparent;
-            padding: 0;
-            position: relative;
-            aspect-ratio: 1.4 / 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: none; border-radius: 0; overflow: visible; cursor: pointer; transition: all 0.25s ease;
+            box-shadow: none; background: transparent; padding: 0; position: relative;
+            aspect-ratio: 1.4 / 1; display: flex; align-items: center; justify-content: center;
         }
-        .shared-btn:active {
-            transform: scale(0.92);
-            filter: brightness(0.7);
-        }
-        .shared-btn img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            padding: 4px;
-        }
+        .shared-btn:active { transform: scale(0.92); filter: brightness(0.7); }
+        .shared-btn img { width: 100%; height: 100%; object-fit: contain; display: block; padding: 4px; }
         .shared-btn .shared-label {
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(4px);
-            color: #f5ede4;
-            padding: 3px 14px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            white-space: nowrap;
-            font-weight: bold;
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); color: #f5ede4;
+            padding: 3px 14px; border-radius: 30px; font-size: 0.7rem; letter-spacing: 2px;
+            white-space: nowrap; font-weight: bold;
         }
 
+        /* ===== 形态页面 ===== */
         .morph-page {
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 780px;
-            padding: 20px 16px 30px;
-            position: relative;
-            display: none;
-            flex-direction: column;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            min-height: 780px; padding: 20px 16px 30px; position: relative; display: none; flex-direction: column;
         }
-        .morph-page.active {
-            display: flex;
-            animation: slideIn 0.5s ease-out;
-        }
+        .morph-page.active { display: flex; animation: slideIn 0.5s ease-out; }
         .morph-page .morph-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            flex-shrink: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.15); flex-shrink: 0;
         }
         .morph-page .morph-header .back-btn {
-            background: none;
-            border: none;
-            color: #f5ede4;
-            font-size: 1.6rem;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 30px;
-            transition: 0.2s;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            background: none; border: none; color: #f5ede4; font-size: 1.6rem; cursor: pointer;
+            padding: 4px 10px; border-radius: 30px; transition: 0.2s; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
         }
-        .morph-page .morph-header .back-btn:active {
-            transform: scale(0.85);
-            opacity: 0.5;
-        }
+        .morph-page .morph-header .back-btn:active { transform: scale(0.85); opacity: 0.5; }
         .morph-page .morph-header .morph-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #f5ede4;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
-            letter-spacing: 4px;
+            font-size: 1.2rem; font-weight: bold; color: #f5ede4; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); letter-spacing: 4px;
         }
-
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-            margin-top: 10px;
-            margin-bottom: 0;
-            flex-shrink: 0;
-        }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 10px; margin-bottom: 0; flex-shrink: 0; }
         .morph-btn {
-            border: none;
-            border-radius: 16px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            background: transparent;
-            padding: 0;
-            position: relative;
-            aspect-ratio: 1 / 1;
-            min-height: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: none; border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.25s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); background: transparent; padding: 0; position: relative;
+            aspect-ratio: 1 / 1; min-height: 90px; display: flex; align-items: center; justify-content: center;
         }
-        .morph-btn:active {
-            transform: scale(0.92);
-            filter: brightness(0.7);
-        }
-        .morph-btn img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            padding: 4px;
-        }
+        .morph-btn:active { transform: scale(0.92); filter: brightness(0.7); }
+        .morph-btn img { width: 100%; height: 100%; object-fit: contain; display: block; padding: 4px; }
         .morph-btn .btn-label {
-            position: absolute;
-            bottom: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(4px);
-            color: #f5ede4;
-            padding: 3px 12px;
-            border-radius: 30px;
-            font-size: 0.6rem;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            font-weight: bold;
+            position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); color: #f5ede4;
+            padding: 3px 12px; border-radius: 30px; font-size: 0.6rem; letter-spacing: 1px;
+            white-space: nowrap; font-weight: bold;
         }
-
         .morph-btn-text {
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(6px);
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            aspect-ratio: 1 / 1;
-            min-height: 90px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.15); border-radius: 16px; background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(6px); cursor: pointer; transition: all 0.25s ease; display: flex;
+            flex-direction: column; align-items: center; justify-content: center; padding: 12px;
+            aspect-ratio: 1 / 1; min-height: 90px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); position: relative;
         }
-        .morph-btn-text:active {
-            transform: scale(0.92);
-            filter: brightness(0.7);
-        }
-        .morph-btn-text::before,
-        .morph-btn-text::after {
-            content: '✦';
-            position: absolute;
-            color: rgba(255, 255, 255, 0.15);
-            font-size: 0.8rem;
-        }
+        .morph-btn-text:active { transform: scale(0.92); filter: brightness(0.7); }
+        .morph-btn-text::before, .morph-btn-text::after { content: '✦'; position: absolute; color: rgba(255, 255, 255, 0.15); font-size: 0.8rem; }
         .morph-btn-text::before { top: 8px; left: 10px; }
         .morph-btn-text::after { bottom: 8px; right: 10px; }
         .morph-btn-text .text-label {
-            font-family: 'Noto Serif SC', serif;
-            color: #f5ede4;
-            font-size: 0.9rem;
-            letter-spacing: 6px;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
-            line-height: 1.6;
-            text-align: center;
+            font-family: 'Noto Serif SC', serif; color: #f5ede4; font-size: 0.9rem; letter-spacing: 6px;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); line-height: 1.6; text-align: center;
         }
-        .morph-btn-text .text-sub {
-            font-size: 0.5rem;
-            color: rgba(255, 255, 255, 0.25);
-            letter-spacing: 3px;
-            margin-top: 4px;
-            font-family: 'Georgia', serif;
-        }
-        .morph-btn-text .corner {
-            position: absolute;
-            color: rgba(255, 255, 255, 0.08);
-            font-size: 1.2rem;
-        }
+        .morph-btn-text .text-sub { font-size: 0.5rem; color: rgba(255, 255, 255, 0.25); letter-spacing: 3px; margin-top: 4px; font-family: 'Georgia', serif; }
+        .morph-btn-text .corner { position: absolute; color: rgba(255, 255, 255, 0.08); font-size: 1.2rem; }
         .morph-btn-text .corner-tl { top: 6px; left: 8px; }
         .morph-btn-text .corner-br { bottom: 6px; right: 8px; }
 
-        .question-area {
-            flex-shrink: 0;
-            margin-top: 24px;
-            padding-top: 0;
-            display: flex;
-            flex-direction: column;
-        }
+        /* ===== 问卷便签 ===== */
+        .question-area { flex-shrink: 0; margin-top: 24px; padding-top: 0; display: flex; flex-direction: column; }
         .question-card {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(8px);
-            border-radius: 20px;
-            padding: 18px 20px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            width: 100%; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(8px); border-radius: 20px;
+            padding: 18px 20px 20px; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
-        .question-card .q-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .question-card .q-header .q-day {
-            font-size: 0.55rem;
-            color: rgba(255, 255, 255, 0.25);
-            letter-spacing: 2px;
-        }
-        .question-card .q-header .q-bird {
-            font-size: 0.8rem;
-            opacity: 0.3;
-        }
-        .question-card .q-text {
-            font-size: 1rem;
-            color: #f5ede4;
-            line-height: 1.7;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            margin-bottom: 12px;
-            font-style: italic;
-            letter-spacing: 1px;
-        }
-        .question-card .q-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+        .question-card .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .question-card .q-header .q-day { font-size: 0.55rem; color: rgba(255, 255, 255, 0.25); letter-spacing: 2px; }
+        .question-card .q-header .q-bird { font-size: 0.8rem; opacity: 0.3; }
+        .question-card .q-text { font-size: 1rem; color: #f5ede4; line-height: 1.7; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); margin-bottom: 12px; font-style: italic; letter-spacing: 1px; }
+        .question-card .q-row { display: flex; gap: 8px; align-items: center; }
         .question-card .q-row .q-input {
-            flex: 1;
-            padding: 10px 14px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(0, 0, 0, 0.2);
-            color: #f5ede4;
-            font-size: 0.85rem;
-            font-family: inherit;
-            outline: none;
-            transition: 0.2s;
+            flex: 1; padding: 10px 14px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.2); color: #f5ede4; font-size: 0.85rem; font-family: inherit; outline: none; transition: 0.2s;
         }
-        .question-card .q-row .q-input:focus {
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-        .question-card .q-row .q-input::placeholder {
-            color: rgba(255, 255, 255, 0.2);
-        }
-        .question-card .q-row .q-input:disabled {
-            opacity: 0.5;
-        }
+        .question-card .q-row .q-input:focus { border-color: rgba(255, 255, 255, 0.3); }
+        .question-card .q-row .q-input::placeholder { color: rgba(255, 255, 255, 0.2); }
+        .question-card .q-row .q-input:disabled { opacity: 0.5; }
         .question-card .q-row .q-submit {
-            padding: 10px 18px;
-            border-radius: 14px;
-            border: none;
-            background: rgba(255, 255, 255, 0.08);
-            color: #f5ede4;
-            font-size: 0.8rem;
-            font-family: inherit;
-            cursor: pointer;
-            transition: 0.2s;
-            white-space: nowrap;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px 18px; border-radius: 14px; border: none; background: rgba(255, 255, 255, 0.08);
+            color: #f5ede4; font-size: 0.8rem; font-family: inherit; cursor: pointer; transition: 0.2s; white-space: nowrap; border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .question-card .q-row .q-submit:active {
-            transform: scale(0.92);
-            opacity: 0.6;
-        }
-        .question-card .q-row .q-submit:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .dream-answer-wrapper {
-            margin-top: 12px;
-            position: relative;
-            border-radius: 14px;
-            overflow: hidden;
-            min-height: 50px;
-            transition: all 0.4s ease;
-        }
+        .question-card .q-row .q-submit:active { transform: scale(0.92); opacity: 0.6; }
+        .question-card .q-row .q-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+        .dream-answer-wrapper { margin-top: 12px; position: relative; border-radius: 14px; overflow: hidden; min-height: 50px; transition: all 0.4s ease; }
         .dream-answer-wrapper .dream-blur {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            backdrop-filter: blur(8px);
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-            transition: opacity 0.6s ease;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.3); border-radius: 14px; display: flex; align-items: center;
+            justify-content: center; z-index: 2; transition: opacity 0.6s ease;
         }
-        .dream-answer-wrapper .dream-blur.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .dream-answer-wrapper .dream-blur span {
-            color: rgba(255, 255, 255, 0.15);
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-        }
+        .dream-answer-wrapper .dream-blur.hidden { opacity: 0; pointer-events: none; }
+        .dream-answer-wrapper .dream-blur span { color: rgba(255, 255, 255, 0.15); font-size: 0.7rem; letter-spacing: 3px; }
         .dream-answer-wrapper .dream-text {
-            padding: 12px 16px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            line-height: 1.7;
-            font-style: italic;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            min-height: 50px;
-            display: flex;
-            align-items: center;
+            padding: 12px 16px; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; line-height: 1.7;
+            font-style: italic; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); min-height: 50px; display: flex; align-items: center;
         }
-        .dream-answer-wrapper .dream-text.empty {
-            color: rgba(255, 255, 255, 0.15);
-            font-style: normal;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-        }
+        .dream-answer-wrapper .dream-text.empty { color: rgba(255, 255, 255, 0.15); font-style: normal; font-size: 0.7rem; letter-spacing: 2px; }
 
-        .sub-page {
-            display: none;
-            animation: slideIn 0.4s ease-out;
-            padding: 16px 0;
-            flex: 1;
-        }
-        .sub-page.active {
-            display: block;
-        }
-        .sub-page .sub-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
+        /* ===== 子页面 ===== */
+        .sub-page { display: none; animation: slideIn 0.4s ease-out; padding: 16px 0; flex: 1; }
+        .sub-page.active { display: block; }
+        .sub-page .sub-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .sub-page .sub-header .sub-back {
-            background: rgba(131, 47, 35, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #f5ede4;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 6px 16px;
-            border-radius: 30px;
-            transition: 0.2s;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(6px);
-            font-weight: bold;
+            background: rgba(131, 47, 35, 0.75); border: 1px solid rgba(255, 255, 255, 0.2); color: #f5ede4;
+            font-size: 1.2rem; cursor: pointer; padding: 6px 16px; border-radius: 30px; transition: 0.2s;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); backdrop-filter: blur(6px); font-weight: bold;
         }
-        .sub-page .sub-header .sub-back:active {
-            transform: scale(0.85);
-            opacity: 0.5;
-        }
-        .sub-page .sub-header .sub-title {
-            font-size: 1rem;
-            color: #f5ede4;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
-            letter-spacing: 3px;
-            font-weight: bold;
-        }
+        .sub-page .sub-header .sub-back:active { transform: scale(0.85); opacity: 0.5; }
+        .sub-page .sub-header .sub-title { font-size: 1rem; color: #f5ede4; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); letter-spacing: 3px; font-weight: bold; }
 
-        .grid-wrapper {
-            max-height: 620px;
-            overflow-y: auto;
-            padding-right: 4px;
-            border-radius: 16px;
-            background-size: cover;
-            background-position: center;
-            padding: 12px;
-        }
+        /* ===== 3×3 九宫格 ===== */
+        .grid-wrapper { max-height: 620px; overflow-y: auto; padding-right: 4px; border-radius: 16px; background-size: cover; background-position: center; padding: 12px; }
         .grid-wrapper::-webkit-scrollbar { width: 4px; }
-        .grid-wrapper::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-        .grid-3x3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
+        .grid-wrapper::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .grid-3x3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .grid-item {
-            aspect-ratio: 1 / 1;
-            border-radius: 12px;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            transition: 0.2s;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid rgba(255, 255, 255, 0.08);
+            aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; background: rgba(0, 0, 0, 0.3);
+            cursor: pointer; transition: 0.2s; position: relative; display: flex; align-items: center;
+            justify-content: center; border: 2px solid rgba(255, 255, 255, 0.08);
         }
         .grid-item:active { transform: scale(0.94); }
-        .grid-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .grid-item .empty-placeholder {
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 0.7rem;
-            text-align: center;
-            letter-spacing: 1px;
-        }
+        .grid-item img { width: 100%; height: 100%; object-fit: cover; }
+        .grid-item .empty-placeholder { color: rgba(255, 255, 255, 0.2); font-size: 0.7rem; text-align: center; letter-spacing: 1px; }
         .grid-item .grid-desc {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            padding: 4px 8px;
-            color: #f5ede4;
-            font-size: 0.6rem;
-            letter-spacing: 1px;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-            text-align: center;
+            position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+            padding: 4px 8px; color: #f5ede4; font-size: 0.6rem; letter-spacing: 1px; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); text-align: center;
         }
         .grid-item .grid-del-btn {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.65);
-            color: #f5ede4;
-            border: none;
-            cursor: pointer;
-            font-size: 0.75rem;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            z-index: 3;
-            padding: 0;
+            position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(0, 0, 0, 0.65); color: #f5ede4; border: none; cursor: pointer; font-size: 0.75rem;
+            line-height: 1; display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 3; padding: 0;
         }
-        .grid-item .grid-del-btn:active {
-            transform: scale(0.85);
-            background: rgba(131, 47, 35, 0.9);
-        }
+        .grid-item .grid-del-btn:active { transform: scale(0.85); background: rgba(131, 47, 35, 0.9); }
 
-        .doc-item {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(4px);
-            border-radius: 16px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
-        }
-        .doc-item .doc-text {
-            color: #f5ede4;
-            font-size: 0.9rem;
-            line-height: 1.7;
-            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
-            margin-bottom: 6px;
-            word-break: break-word;
-        }
-        .doc-item .doc-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.65rem;
-            color: rgba(255, 255, 255, 0.4);
-        }
-        .doc-item .doc-actions button {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            transition: 0.2s;
-        }
-        .doc-item .doc-actions button:active {
-            transform: scale(0.85);
-            opacity: 0.5;
-        }
+        /* ===== 文稿卡片 ===== */
+        .doc-item { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; }
+        .doc-item .doc-text { color: #f5ede4; font-size: 0.9rem; line-height: 1.7; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3); margin-bottom: 6px; word-break: break-word; }
+        .doc-item .doc-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); }
+        .doc-item .doc-actions button { background: none; border: none; color: rgba(255, 255, 255, 0.5); cursor: pointer; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; transition: 0.2s; }
+        .doc-item .doc-actions button:active { transform: scale(0.85); opacity: 0.5; }
 
-        .doc-item.qna-item {
-            background: rgba(0, 0, 0, 0.35);
-        }
-        .qna-question {
-            font-family: 'Noto Serif SC', serif;
-            color: #f5ede4;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
-            font-style: italic;
-            letter-spacing: 1px;
-        }
-        .qna-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 6px;
-            font-size: 0.82rem;
-            line-height: 1.6;
-        }
-        .qna-label {
-            flex-shrink: 0;
-            color: rgba(255, 255, 255, 0.5);
-            font-family: 'Noto Serif SC', serif;
-            letter-spacing: 2px;
-            font-size: 0.75rem;
-            padding-top: 1px;
-        }
-        .qna-text {
-            color: #f5ede4;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-            word-break: break-word;
-        }
-        .qna-text.dream {
-            color: rgba(255, 255, 255, 0.78);
-            font-style: italic;
-        }
+        /* ===== 问答卡片 ===== */
+        .doc-item.qna-item { background: rgba(0, 0, 0, 0.35); }
+        .qna-question { font-family: 'Noto Serif SC', serif; color: #f5ede4; font-size: 0.9rem; line-height: 1.6; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255, 255, 255, 0.12); font-style: italic; letter-spacing: 1px; }
+        .qna-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 0.82rem; line-height: 1.6; }
+        .qna-label { flex-shrink: 0; color: rgba(255, 255, 255, 0.5); font-family: 'Noto Serif SC', serif; letter-spacing: 2px; font-size: 0.75rem; padding-top: 1px; }
+        .qna-text { color: #f5ede4; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4); word-break: break-word; }
+        .qna-text.dream { color: rgba(255, 255, 255, 0.78); font-style: italic; }
 
         .upload-fab {
-            background: rgba(131, 47, 35, 0.75);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 60px;
-            padding: 8px 20px;
-            color: #f5ede4;
-            font-size: 0.85rem;
-            font-family: inherit;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            letter-spacing: 2px;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+            background: rgba(131, 47, 35, 0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 60px; padding: 8px 20px; color: #f5ede4; font-size: 0.85rem; font-family: inherit;
+            cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
+            letter-spacing: 2px; font-weight: bold; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
         }
-        .upload-fab:active {
-            transform: scale(0.92);
-            opacity: 0.6;
-        }
+        .upload-fab:active { transform: scale(0.92); opacity: 0.6; }
+        .upload-fab:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
-            z-index: 999;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        /* ===== 弹窗 ===== */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
         .modal-overlay.open { display: flex; }
-        .modal-box {
-            background: #f5ede4;
-            border-radius: 28px;
-            padding: 24px 20px 28px;
-            width: 100%;
-            max-width: 420px;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: modalIn 0.3s ease-out;
-        }
-        @keyframes modalIn {
-            0% { opacity: 0; transform: scale(0.92) translateY(20px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .modal-box .modal-title {
-            font-size: 1.1rem;
-            color: #3E2D45;
-            text-align: center;
-            margin-bottom: 16px;
-            letter-spacing: 3px;
-            font-weight: bold;
-        }
+        .modal-box { background: #f5ede4; border-radius: 28px; padding: 24px 20px 28px; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; animation: modalIn 0.3s ease-out; }
+        @keyframes modalIn { 0% { opacity: 0; transform: scale(0.92) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-box .modal-title { font-size: 1.1rem; color: #3E2D45; text-align: center; margin-bottom: 16px; letter-spacing: 3px; font-weight: bold; }
         .modal-box .form-group { margin-bottom: 12px; }
-        .modal-box .form-group label {
-            display: block;
-            font-size: 0.75rem;
-            color: #836529;
-            margin-bottom: 4px;
-            letter-spacing: 1px;
-        }
-        .modal-box .form-group input,
-        .modal-box .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border: 2px solid #e8ddd0;
-            border-radius: 14px;
-            font-size: 0.9rem;
-            background: #fffcf8;
-            font-family: inherit;
-            color: #3E2D45;
-            outline: none;
-            transition: 0.2s;
-        }
-        .modal-box .form-group textarea {
-            min-height: 60px;
-            resize: vertical;
-        }
-        .modal-box .form-group .file-label {
-            display: inline-block;
-            background: #e8ddd0;
-            padding: 6px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: #3E2D45;
-            transition: 0.2s;
-        }
+        .modal-box .form-group label { display: block; font-size: 0.75rem; color: #836529; margin-bottom: 4px; letter-spacing: 1px; }
+        .modal-box .form-group input, .modal-box .form-group textarea { width: 100%; padding: 10px 14px; border: 2px solid #e8ddd0; border-radius: 14px; font-size: 0.9rem; background: #fffcf8; font-family: inherit; color: #3E2D45; outline: none; transition: 0.2s; }
+        .modal-box .form-group textarea { min-height: 60px; resize: vertical; }
+        .modal-box .form-group .file-label { display: inline-block; background: #e8ddd0; padding: 6px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; color: #3E2D45; transition: 0.2s; }
         .modal-box .form-group .file-label:active { transform: scale(0.94); }
         .modal-box .form-group .file-label input { display: none; }
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-        .modal-actions button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: inherit;
-        }
-        .modal-actions .btn-submit {
-            background: #832F23;
-            color: #fff;
-        }
-        .modal-actions .btn-submit:active {
-            transform: scale(0.94);
-            opacity: 0.7;
-        }
-        .modal-actions .btn-cancel {
-            background: #e8ddd0;
-            color: #3E2D45;
-        }
-        .modal-actions .btn-cancel:active {
-            transform: scale(0.94);
-            opacity: 0.6;
-        }
+        .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+        .modal-actions button { flex: 1; padding: 10px; border: none; border-radius: 40px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit; }
+        .modal-actions .btn-submit { background: #832F23; color: #fff; }
+        .modal-actions .btn-submit:active { transform: scale(0.94); opacity: 0.7; }
+        .modal-actions .btn-cancel { background: #e8ddd0; color: #3E2D45; }
+        .modal-actions .btn-cancel:active { transform: scale(0.94); opacity: 0.6; }
 
-        .image-viewer {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(12px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 20px;
-        }
+        /* ===== 图片放大查看器 ===== */
+        .image-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
         .image-viewer.open { display: flex; }
-        .image-viewer .viewer-close {
-            position: absolute;
-            top: 20px;
-            right: 24px;
-            font-size: 2rem;
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            transition: 0.2s;
-            border: none;
-            background: none;
-        }
-        .image-viewer .viewer-close:active {
-            transform: scale(0.85);
-            opacity: 0.5;
-        }
-        .image-viewer .viewer-img {
-            max-width: 100%;
-            max-height: 70vh;
-            border-radius: 16px;
-            object-fit: contain;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
-        }
-        .image-viewer .viewer-desc {
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 16px;
-            font-size: 0.9rem;
-            text-align: center;
-            letter-spacing: 2px;
-            max-width: 80%;
-        }
-        .image-viewer .viewer-nav {
-            display: flex;
-            gap: 40px;
-            margin-top: 20px;
-        }
-        .image-viewer .viewer-nav button {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 1.8rem;
-            cursor: pointer;
-            transition: 0.2s;
-            padding: 4px 16px;
-            border-radius: 40px;
-        }
-        .image-viewer .viewer-nav button:active {
-            transform: scale(0.85);
-            opacity: 0.5;
-        }
+        .image-viewer .viewer-close { position: absolute; top: 20px; right: 24px; font-size: 2rem; color: rgba(255, 255, 255, 0.6); cursor: pointer; transition: 0.2s; border: none; background: none; }
+        .image-viewer .viewer-close:active { transform: scale(0.85); opacity: 0.5; }
+        .image-viewer .viewer-img { max-width: 100%; max-height: 70vh; border-radius: 16px; object-fit: contain; box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5); }
+        .image-viewer .viewer-desc { color: rgba(255, 255, 255, 0.7); margin-top: 16px; font-size: 0.9rem; text-align: center; letter-spacing: 2px; max-width: 80%; }
+        .image-viewer .viewer-nav { display: flex; gap: 40px; margin-top: 20px; }
+        .image-viewer .viewer-nav button { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 1.8rem; cursor: pointer; transition: 0.2s; padding: 4px 16px; border-radius: 40px; }
+        .image-viewer .viewer-nav button:active { transform: scale(0.85); opacity: 0.5; }
 
-        /* ===== 管理模式按钮样式 ===== */
+        /* ===== 管理模式按钮 ===== */
         #admin-toggle {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            z-index: 9999;
-            background: rgba(131, 47, 35, 0.85);
-            color: #f5ede4;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 30px;
-            padding: 6px 16px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            font-family: inherit;
-            transition: 0.2s;
+            position: fixed; top: 12px; right: 12px; z-index: 9999; background: rgba(131, 47, 35, 0.85);
+            color: #f5ede4; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 30px; padding: 6px 16px;
+            font-size: 0.8rem; cursor: pointer; backdrop-filter: blur(6px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); font-family: inherit; transition: 0.2s;
         }
-        #admin-toggle:active {
-            transform: scale(0.92);
-        }
+        #admin-toggle:active { transform: scale(0.92); }
 
         @media (max-width: 400px) {
-            .app { border-radius: 16px; }
-            .page { padding: 14px 12px 20px; }
-            #page-home { padding: 20px 14px; gap: 14px; }
-            #page-home.shared-mode { padding: 14px 12px 20px; }
-            .home-morph .morph-label { font-size: 0.7rem; padding: 4px 16px; }
-            .home-shared { gap: 10px; }
-            .shared-btn .shared-label { font-size: 0.6rem; padding: 2px 10px; }
-            .btn-grid { gap: 8px; }
-            .morph-btn { min-height: 70px; }
-            .morph-btn-text { min-height: 70px; }
-            .morph-btn .btn-label { font-size: 0.5rem; padding: 2px 8px; }
-            .morph-btn-text .text-label { font-size: 0.7rem; letter-spacing: 4px; }
-            .grid-wrapper { max-height: 520px; padding: 8px; }
-            .grid-3x3 { gap: 6px; }
-            .modal-box { padding: 16px 14px; }
-            .question-area { margin-top: 18px; }
-            .question-card { padding: 14px 16px 16px; }
-            .question-card .q-text { font-size: 0.9rem; }
-            .question-card .q-row .q-input { font-size: 0.75rem; padding: 8px 12px; }
-            .question-card .q-row .q-submit { font-size: 0.7rem; padding: 8px 14px; }
-            .dream-answer-wrapper .dream-text { font-size: 0.8rem; padding: 10px 14px; }
+            .app { border-radius: 16px; } .page { padding: 14px 12px 20px; } #page-home { padding: 20px 14px; gap: 14px; }
+            #page-home.shared-mode { padding: 14px 12px 20px; } .home-morph .morph-label { font-size: 0.7rem; padding: 4px 16px; }
+            .home-shared { gap: 10px; } .shared-btn .shared-label { font-size: 0.6rem; padding: 2px 10px; }
+            .btn-grid { gap: 8px; } .morph-btn { min-height: 70px; } .morph-btn-text { min-height: 70px; }
+            .morph-btn .btn-label { font-size: 0.5rem; padding: 2px 8px; } .morph-btn-text .text-label { font-size: 0.7rem; letter-spacing: 4px; }
+            .grid-wrapper { max-height: 520px; padding: 8px; } .grid-3x3 { gap: 6px; }
+            .modal-box { padding: 16px 14px; } .question-area { margin-top: 18px; } .question-card { padding: 14px 16px 16px; }
+            .question-card .q-text { font-size: 0.9rem; } .question-card .q-row .q-input { font-size: 0.75rem; padding: 8px 12px; }
+            .question-card .q-row .q-submit { font-size: 0.7rem; padding: 8px 14px; } .dream-answer-wrapper .dream-text { font-size: 0.8rem; padding: 10px 14px; }
         }
     </style>
 </head>
@@ -1026,15 +383,15 @@
             <div class="modal-box">
                 <div class="modal-title">✧ 上传新内容 ✧</div>
                 <div class="form-group">
-                    <label>上传图片</label>
+                    <label>上传图片 (可多选)</label>
                     <label class="file-label">
                         📎 选择文件
-                        <input type="file" id="uploadFile" accept="image/*">
+                        <input type="file" id="uploadFile" accept="image/*" multiple>
                     </label>
                     <span id="fileNameDisplay" style="font-size: 0.7rem; color: #836529; margin-left: 8px;"></span>
                 </div>
                 <div class="form-group">
-                    <label>文字描述</label>
+                    <label>文字描述 (可选)</label>
                     <textarea id="uploadDesc" placeholder="写点什么…"></textarea>
                 </div>
                 <div class="modal-actions">
@@ -1070,20 +427,16 @@
         const SUPABASE_URL = 'https://iujkturltzwxaoecushv.supabase.co';
         const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2KAsKSk5LZxbQn3uLdY5Uw_pgrNSrU9';
 
-        // 初始化 Supabase 客户端
         let supabaseClient = null;
         async function initSupabase() {
-            if (typeof window.supabase === 'undefined') {
-                console.log('⚠️ Supabase 库未加载，请检查网络');
-                return;
-            }
+            if (typeof window.supabase === 'undefined') return;
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
         }
 
         // ================================================================
         // ★★★ 管理员权限系统 ★★★
         // ================================================================
-        const ADMIN_PASSWORD = '28214'; // 👈 管理员密码
+        const ADMIN_PASSWORD = '28214';
         let isAdmin = localStorage.getItem('handbook_isAdmin') === 'true';
 
         function updateAdminButton() {
@@ -1100,7 +453,7 @@
 
         function toggleAdmin() {
             if (isAdmin) {
-                if (confirm('确定要退出管理模式吗？退出后只能浏览，不能上传和删除。')) {
+                if (confirm('确定要退出管理模式吗？')) {
                     isAdmin = false;
                     localStorage.setItem('handbook_isAdmin', 'false');
                     location.reload();
@@ -1110,10 +463,10 @@
                 if (pwd === ADMIN_PASSWORD) {
                     isAdmin = true;
                     localStorage.setItem('handbook_isAdmin', 'true');
-                    alert('🔓 管理已解锁，现在你可以上传和删除了');
+                    alert('🔓 管理已解锁');
                     location.reload();
                 } else if (pwd !== null) {
-                    alert('❌ 密码错误，请重试');
+                    alert('❌ 密码错误');
                 }
             }
         }
@@ -1205,9 +558,6 @@
             { q: '发现对方居然在偷吃病号餐！', a: '可能是肚子饿了，或者不知道这是病号餐' }
         ];
 
-        // ================================================================
-        // 空数据
-        // ================================================================
         const DEFAULT_DATA = {
             morph1: { album: [], reality: [], ifline: [] },
             morph2: { album: [], reality: [], ifline: [] },
@@ -1220,50 +570,28 @@
         async function syncFromCloud() {
             if (!supabaseClient) return;
             try {
-                const { data, error } = await supabaseClient
-                    .from('handbook_data')
-                    .select('content')
-                    .order('updated_at', { ascending: false })
-                    .limit(1);
-                
-                // 解决没数据时 406 报错的问题
-                if (error || !data || data.length === 0) {
-                    console.log('📭 云端暂无数据');
-                    return;
-                }
-                
+                const { data, error } = await supabaseClient.from('handbook_data').select('content').order('updated_at', { ascending: false }).limit(1);
+                if (error || !data || data.length === 0) { console.log('📭 云端暂无数据'); return; }
                 const cloudData = data[0].content;
                 if (cloudData && cloudData.morph1 && cloudData.morph2) {
                     const localTime = appData._updatedAt || 0;
                     const cloudTime = cloudData._updatedAt || 0;
-                    
                     if (cloudTime > localTime) {
                         appData = normalizeData(cloudData);
                         localStorage.setItem('handbook_data', JSON.stringify(appData));
                         console.log('✅ 已从 Supabase 同步最新数据');
-                        location.reload(); 
+                        location.reload();
                     }
                 }
-            } catch (e) {
-                console.log('云端同步异常：', e);
-            }
+            } catch (e) { console.log('云端同步异常：', e); }
         }
 
         async function pushToCloud(data) {
             if (!supabaseClient) return;
             try {
-                const { error } = await supabaseClient
-                    .from('handbook_data')
-                    .insert([{ content: data }]);
-                
-                if (error) {
-                    console.log('云端上传失败：', error.message);
-                } else {
-                    console.log('✅ 已同步到 Supabase');
-                }
-            } catch (e) {
-                console.log('云端同步异常：', e);
-            }
+                const { error } = await supabaseClient.from('handbook_data').insert([{ content: data }]);
+                if (error) { console.log('云端上传失败：', error.message); } else { console.log('✅ 已同步到 Supabase'); }
+            } catch (e) { console.log('云端同步异常：', e); }
         }
 
         // ================================================================
@@ -1275,17 +603,9 @@
             if (!data.shared.letter) data.shared.letter = [];
             ['morph1', 'morph2'].forEach(k => {
                 if (!data[k]) data[k] = {};
-                ['album', 'reality', 'ifline'].forEach(s => {
-                    if (!data[k][s]) data[k][s] = [];
-                });
-                if (data[k].guzi) {
-                    if (!data.shared.guzi.length) data.shared.guzi = data.shared.guzi.concat(data[k].guzi);
-                    delete data[k].guzi;
-                }
-                if (data[k].letter) {
-                    if (!data.shared.letter.length) data.shared.letter = data.shared.letter.concat(data[k].letter);
-                    delete data[k].letter;
-                }
+                ['album', 'reality', 'ifline'].forEach(s => { if (!data[k][s]) data[k][s] = []; });
+                if (data[k].guzi) { if (!data.shared.guzi.length) data.shared.guzi = data.shared.guzi.concat(data[k].guzi); delete data[k].guzi; }
+                if (data[k].letter) { if (!data.shared.letter.length) data.shared.letter = data.shared.letter.concat(data[k].letter); delete data[k].letter; }
             });
             return data;
         }
@@ -1294,18 +614,13 @@
             ['morph1', 'morph2'].forEach(k => {
                 ['album', 'reality', 'ifline'].forEach(s => {
                     if (Array.isArray(data[k][s])) {
-                        data[k][s] = data[k][s].filter(item => {
-                            if (!item.id) return false;
-                            return item.id.startsWith('u_') || item.type === 'qna';
-                        });
+                        data[k][s] = data[k][s].filter(item => item.id && (item.id.startsWith('u_') || item.type === 'qna'));
                     }
                 });
             });
             if (data.shared) {
                 ['guzi', 'letter'].forEach(t => {
-                    if (Array.isArray(data.shared[t])) {
-                        data.shared[t] = data.shared[t].filter(item => item.id && item.id.startsWith('u_'));
-                    }
+                    if (Array.isArray(data.shared[t])) data.shared[t] = data.shared[t].filter(item => item.id && item.id.startsWith('u_'));
                 });
             }
             return data;
@@ -1314,14 +629,8 @@
         function loadAllData() {
             const stored = localStorage.getItem('handbook_data');
             let data;
-            if (stored) {
-                try { data = JSON.parse(stored); } catch (e) { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
-            } else {
-                data = JSON.parse(JSON.stringify(DEFAULT_DATA));
-            }
-            data = normalizeData(data);
-            data = cleanLegacySamples(data);
-            return data;
+            if (stored) { try { data = JSON.parse(stored); } catch (e) { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); } } else { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+            data = normalizeData(data); data = cleanLegacySamples(data); return data;
         }
 
         function saveAllData(data) {
@@ -1331,56 +640,25 @@
         }
 
         let appData = loadAllData();
-        let currentMorph = '1';
-        let currentSub = 'album';
-        let currentShared = null;
-        let viewerImages = [];
-        let viewerIndex = 0;
+        let currentMorph = '1', currentSub = 'album', currentShared = null;
+        let viewerImages = [], viewerIndex = 0;
 
         // ================================================================
         // 辅助函数
         // ================================================================
-        function getMorphData(morph) {
-            return morph === '1' ? appData.morph1 : appData.morph2;
-        }
-
-        function getSubData(morph, sub) {
-            const data = getMorphData(morph);
-            const map = { album: 'album', reality: 'reality', ifline: 'ifline' };
-            return data[map[sub]] || [];
-        }
-
-        function getSubTitle(morph, sub) {
-            const titles = {
-                '1': { album: '画稿相册', reality: '现世', ifline: 'if线' },
-                '2': { album: '画稿相册', reality: '现世', ifline: 'if线' }
-            };
-            return titles[morph]?.[sub] || sub;
-        }
-
-        function getSharedData(type) {
-            if (!appData.shared) appData.shared = { guzi: [], letter: [] };
-            return appData.shared[type] || [];
-        }
-
-        function getSharedTitle(type) {
-            return type === 'guzi' ? '谷子相册' : '书信';
-        }
-
-        function generateId() {
-            return 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-        }
-
-        function getToday() {
-            return new Date().toLocaleDateString('zh-CN');
-        }
+        function getMorphData(morph) { return morph === '1' ? appData.morph1 : appData.morph2; }
+        function getSubData(morph, sub) { return getMorphData(morph)[sub] || []; }
+        function getSubTitle(morph, sub) { return { '1': { album: '画稿相册', reality: '现世', ifline: 'if线' }, '2': { album: '画稿相册', reality: '现世', ifline: 'if线' } }[morph]?.[sub] || sub; }
+        function getSharedData(type) { if (!appData.shared) appData.shared = { guzi: [], letter: [] }; return appData.shared[type] || []; }
+        function getSharedTitle(type) { return type === 'guzi' ? '谷子相册' : '书信'; }
+        function generateId() { return 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4); }
+        function getToday() { return new Date().toLocaleDateString('zh-CN'); }
 
         // ================================================================
         // 每日问答
         // ================================================================
         function getTodayQna() {
-            const startDate = new Date(2026, 0, 1);
-            const now = new Date();
+            const startDate = new Date(2026, 0, 1); const now = new Date();
             const diff = Math.floor((now - startDate) / 86400000);
             const idx = ((diff % QNA_PAIRS.length) + QNA_PAIRS.length) % QNA_PAIRS.length;
             return QNA_PAIRS[idx];
@@ -1388,187 +666,80 @@
 
         function findTodayQnaRecord(morph, qnaText) {
             const morphKey = morph === '1' ? 'morph1' : 'morph2';
-            const today = getToday();
-            return (appData[morphKey].reality || []).find(r =>
-                r.type === 'qna' && r.q === qnaText && r.date === today
-            );
+            return (appData[morphKey].reality || []).find(r => r.type === 'qna' && r.q === qnaText && r.date === getToday());
         }
 
         function setupQuestion(morph) {
-            const prefix = morph;
-            const input = document.getElementById('q-input-' + prefix);
-            const submit = document.getElementById('q-submit-' + prefix);
-            const blur = document.getElementById('dream-blur-' + prefix);
-            const dreamText = document.getElementById('dream-text-' + prefix);
-            const qText = document.getElementById('q-text-' + prefix);
-
+            const input = document.getElementById('q-input-' + morph), submit = document.getElementById('q-submit-' + morph);
+            const blur = document.getElementById('dream-blur-' + morph), dreamText = document.getElementById('dream-text-' + morph);
+            const qText = document.getElementById('q-text-' + morph);
             if (!input || !submit || !qText) return;
-
-            const qna = getTodayQna();
-            qText.textContent = qna.q;
-
+            const qna = getTodayQna(); qText.textContent = qna.q;
             const existing = findTodayQnaRecord(morph, qna.q);
             if (existing) {
-                blur.classList.add('hidden');
-                dreamText.textContent = existing.dreamAnswer;
-                dreamText.className = 'dream-text';
-                input.value = existing.userAnswer;
-                input.disabled = true;
-                submit.disabled = true;
-                submit.textContent = '已回答';
+                blur.classList.add('hidden'); dreamText.textContent = existing.dreamAnswer; dreamText.className = 'dream-text';
+                input.value = existing.userAnswer; input.disabled = true; submit.disabled = true; submit.textContent = '已回答';
             } else {
-                blur.classList.remove('hidden');
-                dreamText.textContent = '等待你的回答…';
-                dreamText.className = 'dream-text empty';
-                input.disabled = false;
-                submit.disabled = false;
-                submit.textContent = '提交';
-                input.value = '';
+                blur.classList.remove('hidden'); dreamText.textContent = '等待你的回答…'; dreamText.className = 'dream-text empty';
+                input.disabled = false; submit.disabled = false; submit.textContent = '提交'; input.value = '';
             }
         }
 
         function handleQuestionSubmit(morph) {
-            const prefix = morph;
-            const input = document.getElementById('q-input-' + prefix);
-            const submit = document.getElementById('q-submit-' + prefix);
-            const blur = document.getElementById('dream-blur-' + prefix);
-            const dreamText = document.getElementById('dream-text-' + prefix);
-
-            if (!input || !submit) return;
-            if (input.disabled) return;
-
-            const answer = input.value.trim();
-            if (!answer) {
-                alert('请先写下你的回答～');
-                return;
-            }
-
-            const qna = getTodayQna();
-            if (findTodayQnaRecord(morph, qna.q)) return;
-
+            const input = document.getElementById('q-input-' + morph), submit = document.getElementById('q-submit-' + morph);
+            const blur = document.getElementById('dream-blur-' + morph), dreamText = document.getElementById('dream-text-' + morph);
+            if (!input || !submit || input.disabled) return;
+            const answer = input.value.trim(); if (!answer) { alert('请先写下你的回答～'); return; }
+            const qna = getTodayQna(); if (findTodayQnaRecord(morph, qna.q)) return;
             const morphKey = morph === '1' ? 'morph1' : 'morph2';
-            const today = getToday();
-
-            appData[morphKey].reality.unshift({
-                id: generateId(),
-                type: 'qna',
-                q: qna.q,
-                userAnswer: answer,
-                dreamAnswer: qna.a,
-                date: today
-            });
+            appData[morphKey].reality.unshift({ id: generateId(), type: 'qna', q: qna.q, userAnswer: answer, dreamAnswer: qna.a, date: getToday() });
             saveAllData(appData);
-
-            blur.classList.add('hidden');
-            dreamText.textContent = qna.a;
-            dreamText.className = 'dream-text';
-            input.disabled = true;
-            submit.disabled = true;
-            submit.textContent = '已回答';
-
+            blur.classList.add('hidden'); dreamText.textContent = qna.a; dreamText.className = 'dream-text';
+            input.disabled = true; submit.disabled = true; submit.textContent = '已回答';
             playWoodSound();
         }
 
-        // ================================================================
-        // 页面切换
-        // ================================================================
         function switchPage(pageId) {
-            const allPages = document.querySelectorAll('.page, .morph-page');
-            allPages.forEach(el => {
-                el.classList.remove('active');
-                el.style.display = 'none';
-            });
+            document.querySelectorAll('.page, .morph-page').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
             const target = document.getElementById(pageId);
-            if (target) {
-                target.classList.add('active');
-                target.style.display = 'flex';
-            }
+            if (target) { target.classList.add('active'); target.style.display = 'flex'; }
         }
 
         // ================================================================
         // 渲染形态子页面
         // ================================================================
         function renderSubPage(morph, sub) {
-            const sharedContainer = document.getElementById('shared-container');
-            if (sharedContainer) sharedContainer.innerHTML = '';
+            const sharedContainer = document.getElementById('shared-container'); if (sharedContainer) sharedContainer.innerHTML = '';
             currentShared = null;
+            const container = document.getElementById('sub' + morph + '-container'); if (!container) return;
+            const btnGrid = document.getElementById('btn-grid-' + morph), questionArea = document.getElementById('question-area-' + morph);
+            if (btnGrid) btnGrid.style.display = 'none'; if (questionArea) questionArea.style.display = 'none';
 
-            const containerId = 'sub' + morph + '-container';
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            const btnGrid = document.getElementById('btn-grid-' + morph);
-            const questionArea = document.getElementById('question-area-' + morph);
-            if (btnGrid) btnGrid.style.display = 'none';
-            if (questionArea) questionArea.style.display = 'none';
-
-            const items = getSubData(morph, sub);
-            const isImageSub = sub === 'album';
-            const title = getSubTitle(morph, sub);
+            const items = getSubData(morph, sub), isImageSub = sub === 'album', title = getSubTitle(morph, sub);
             const bgImg = morph === '1' ? 'images/f1.png' : 'images/f2.png';
 
-            let html = `<div class="sub-page active">`;
-            html += `<div class="sub-header">
-                        <button class="sub-back" data-morph="${morph}" data-sub="${sub}">‹</button>
-                        <span class="sub-title">${title}</span>
-                        ${isAdmin ? `<button class="upload-fab" data-upload="${morph}|${sub}">✧ 上传</button>` : ''}
-                     </div>`;
+            let html = `<div class="sub-page active"><div class="sub-header"><button class="sub-back" data-morph="${morph}" data-sub="${sub}">‹</button><span class="sub-title">${title}</span>${isAdmin ? `<button class="upload-fab" data-upload="${morph}|${sub}">✧ 上传</button>` : ''}</div>`;
 
             if (isImageSub) {
-                html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');">`;
-                html += `<div class="grid-3x3">`;
+                html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');"><div class="grid-3x3">`;
                 const displayItems = items.length > 0 ? items : [{ empty: true }];
                 for (let i = 0; i < Math.max(displayItems.length, 9); i++) {
                     const item = displayItems[i];
                     if (item && item.img) {
-                        html += `<div class="grid-item" data-img="${item.img}" data-desc="${item.text || ''}">
-                                    <img src="${item.img}" alt="图片">
-                                    <div class="grid-desc">${item.text || ''}</div>
-                                    ${isAdmin ? `<button class="grid-del-btn" data-del="${morph}|${sub}|${item.id}" title="删除">✕</button>` : ''}
-                                 </div>`;
-                    } else {
-                        html += `<div class="grid-item"><span class="empty-placeholder">空</span></div>`;
-                    }
+                        html += `<div class="grid-item" data-img="${item.img}" data-desc="${item.text || ''}"><img src="${item.img}" alt="图片"><div class="grid-desc">${item.text || ''}</div>${isAdmin ? `<button class="grid-del-btn" data-del="${morph}|${sub}|${item.id}" title="删除">✕</button>` : ''}</div>`;
+                    } else { html += `<div class="grid-item"><span class="empty-placeholder">空</span></div>`; }
                 }
-                html += `</div>`;
-                html += `</div>`;
+                html += `</div></div>`;
             } else {
                 html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');">`;
                 items.forEach(item => {
                     if (item.type === 'qna' && item.q) {
-                        html += `<div class="doc-item qna-item">
-                                    <div class="qna-question">✦ ${item.q}</div>
-                                    <div class="qna-row">
-                                        <span class="qna-label">我</span>
-                                        <span class="qna-text">${item.userAnswer || ''}</span>
-                                    </div>
-                                    <div class="qna-row">
-                                        <span class="qna-label">他</span>
-                                        <span class="qna-text dream">${item.dreamAnswer || ''}</span>
-                                    </div>
-                                    <div class="doc-meta">
-                                        <span>📅 ${item.date || ''}</span>
-                                        <div class="doc-actions">
-                                            ${isAdmin ? `<button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>` : ''}
-                                        </div>
-                                    </div>
-                                 </div>`;
+                        html += `<div class="doc-item qna-item"><div class="qna-question">✦ ${item.q}</div><div class="qna-row"><span class="qna-label">我</span><span class="qna-text">${item.userAnswer || ''}</span></div><div class="qna-row"><span class="qna-label">他</span><span class="qna-text dream">${item.dreamAnswer || ''}</span></div><div class="doc-meta"><span>📅 ${item.date || ''}</span><div class="doc-actions">${isAdmin ? `<button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>` : ''}</div></div></div>`;
                     } else {
-                        html += `<div class="doc-item">
-                                    <div class="doc-text">${item.text || ''}</div>
-                                    <div class="doc-meta">
-                                        <span>📅 ${item.date || ''}</span>
-                                        <div class="doc-actions">
-                                            ${isAdmin ? `<button data-edit="${morph}|${sub}|${item.id}">✎ 编辑</button>` : ''}
-                                            ${isAdmin ? `<button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>` : ''}
-                                        </div>
-                                    </div>
-                                 </div>`;
+                        html += `<div class="doc-item"><div class="doc-text">${item.text || ''}</div><div class="doc-meta"><span>📅 ${item.date || ''}</span><div class="doc-actions">${isAdmin ? `<button data-edit="${morph}|${sub}|${item.id}">✎ 编辑</button>` : ''}${isAdmin ? `<button data-del="${morph}|${sub}|${item.id}">✕ 删除</button>` : ''}</div></div></div>`;
                     }
                 });
-                if (items.length === 0) {
-                    html += `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:30px 0; font-size:0.8rem; letter-spacing:2px;">还没有内容，上传第一条吧</div>`;
-                }
+                if (items.length === 0) html += `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:30px 0; font-size:0.8rem; letter-spacing:2px;">还没有内容，上传第一条吧</div>`;
                 html += `</div>`;
             }
             html += `</div>`;
@@ -1580,67 +751,32 @@
         // 渲染共用子页面
         // ================================================================
         function renderSharedPage(type) {
-            const container = document.getElementById('shared-container');
-            if (!container) return;
-
+            const container = document.getElementById('shared-container'); if (!container) return;
             document.getElementById('page-home').classList.add('shared-mode');
-
-            const homeMorphs = document.getElementById('home-morphs');
-            const homeShared = document.getElementById('home-shared');
-            if (homeMorphs) homeMorphs.style.display = 'none';
-            if (homeShared) homeShared.style.display = 'none';
-
+            const homeMorphs = document.getElementById('home-morphs'), homeShared = document.getElementById('home-shared');
+            if (homeMorphs) homeMorphs.style.display = 'none'; if (homeShared) homeShared.style.display = 'none';
             document.querySelectorAll('#sub1-container, #sub2-container').forEach(c => c.innerHTML = '');
-
             currentShared = type;
+            const items = getSharedData(type), isImageSub = type === 'guzi', title = getSharedTitle(type), bgImg = 'images/f1.png';
 
-            const items = getSharedData(type);
-            const isImageSub = type === 'guzi';
-            const title = getSharedTitle(type);
-            const bgImg = 'images/f1.png';
-
-            let html = `<div class="sub-page active">`;
-            html += `<div class="sub-header">
-                        <button class="sub-back" data-shared-back="1">‹</button>
-                        <span class="sub-title">${title}</span>
-                        ${isAdmin ? `<button class="upload-fab" data-shared-upload="${type}">✧ 上传</button>` : ''}
-                     </div>`;
+            let html = `<div class="sub-page active"><div class="sub-header"><button class="sub-back" data-shared-back="1">‹</button><span class="sub-title">${title}</span>${isAdmin ? `<button class="upload-fab" data-shared-upload="${type}">✧ 上传</button>` : ''}</div>`;
 
             if (isImageSub) {
-                html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');">`;
-                html += `<div class="grid-3x3">`;
+                html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');"><div class="grid-3x3">`;
                 const displayItems = items.length > 0 ? items : [{ empty: true }];
                 for (let i = 0; i < Math.max(displayItems.length, 9); i++) {
                     const item = displayItems[i];
                     if (item && item.img) {
-                        html += `<div class="grid-item" data-img="${item.img}" data-desc="${item.text || ''}">
-                                    <img src="${item.img}" alt="图片">
-                                    <div class="grid-desc">${item.text || ''}</div>
-                                    ${isAdmin ? `<button class="grid-del-btn" data-shared-del="${type}|${item.id}" title="删除">✕</button>` : ''}
-                                 </div>`;
-                    } else {
-                        html += `<div class="grid-item"><span class="empty-placeholder">空</span></div>`;
-                    }
+                        html += `<div class="grid-item" data-img="${item.img}" data-desc="${item.text || ''}"><img src="${item.img}" alt="图片"><div class="grid-desc">${item.text || ''}</div>${isAdmin ? `<button class="grid-del-btn" data-shared-del="${type}|${item.id}" title="删除">✕</button>` : ''}</div>`;
+                    } else { html += `<div class="grid-item"><span class="empty-placeholder">空</span></div>`; }
                 }
-                html += `</div>`;
-                html += `</div>`;
+                html += `</div></div>`;
             } else {
                 html += `<div class="grid-wrapper" style="background-image: url('${bgImg}');">`;
                 items.forEach(item => {
-                    html += `<div class="doc-item">
-                                <div class="doc-text">${item.text || ''}</div>
-                                <div class="doc-meta">
-                                    <span>📅 ${item.date || ''}</span>
-                                    <div class="doc-actions">
-                                        ${isAdmin ? `<button data-shared-edit="${type}|${item.id}">✎ 编辑</button>` : ''}
-                                        ${isAdmin ? `<button data-shared-del="${type}|${item.id}">✕ 删除</button>` : ''}
-                                    </div>
-                                </div>
-                             </div>`;
+                    html += `<div class="doc-item"><div class="doc-text">${item.text || ''}</div><div class="doc-meta"><span>📅 ${item.date || ''}</span><div class="doc-actions">${isAdmin ? `<button data-shared-edit="${type}|${item.id}">✎ 编辑</button>` : ''}${isAdmin ? `<button data-shared-del="${type}|${item.id}">✕ 删除</button>` : ''}</div></div></div>`;
                 });
-                if (items.length === 0) {
-                    html += `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:30px 0; font-size:0.8rem; letter-spacing:2px;">还没有内容，上传第一条吧</div>`;
-                }
+                if (items.length === 0) html += `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:30px 0; font-size:0.8rem; letter-spacing:2px;">还没有内容，上传第一条吧</div>`;
                 html += `</div>`;
             }
             html += `</div>`;
@@ -1649,325 +785,187 @@
         }
 
         // ================================================================
-        // 事件绑定：形态子页面
+        // 事件绑定
         // ================================================================
         function bindSubEvents(container, morph, sub, isShared) {
             container.querySelector('.sub-back')?.addEventListener('click', function() {
-                playWoodSound();
-                const btnGrid = document.getElementById('btn-grid-' + morph);
-                const questionArea = document.getElementById('question-area-' + morph);
-                if (btnGrid) btnGrid.style.display = '';
-                if (questionArea) questionArea.style.display = '';
-                container.innerHTML = '';
-                setupQuestion(morph);
+                playWoodSound(); const btnGrid = document.getElementById('btn-grid-' + morph), questionArea = document.getElementById('question-area-' + morph);
+                if (btnGrid) btnGrid.style.display = ''; if (questionArea) questionArea.style.display = '';
+                container.innerHTML = ''; setupQuestion(morph);
             });
-
             container.querySelector('[data-upload]')?.addEventListener('click', function() {
-                playWoodSound();
-                const val = this.dataset.upload.split('|');
-                currentMorph = val[0];
-                currentSub = val[1];
-                currentShared = null;
-                document.getElementById('uploadModal').classList.add('open');
-                document.getElementById('uploadDesc').value = '';
-                document.getElementById('uploadFile').value = '';
-                document.getElementById('fileNameDisplay').textContent = '';
+                playWoodSound(); const val = this.dataset.upload.split('|'); currentMorph = val[0]; currentSub = val[1]; currentShared = null;
+                document.getElementById('uploadModal').classList.add('open'); document.getElementById('uploadDesc').value = ''; document.getElementById('uploadFile').value = ''; document.getElementById('fileNameDisplay').textContent = '';
             });
-
             container.querySelectorAll('[data-del]').forEach(btn => {
                 btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    playWoodSound();
-                    if (!confirm('确定要删除吗？')) return;
-                    const parts = this.dataset.del.split('|');
-                    const morphKey = parts[0] === '1' ? 'morph1' : 'morph2';
-                    const subKey = parts[1];
-                    const id = parts[2];
-                    const data = appData[morphKey];
-                    if (data && data[subKey]) {
-                        data[subKey] = data[subKey].filter(item => item.id !== id);
-                        saveAllData(appData);
-                        renderSubPage(morph, sub);
-                    }
+                    e.stopPropagation(); playWoodSound(); if (!confirm('确定要删除吗？')) return;
+                    const parts = this.dataset.del.split('|'); const morphKey = parts[0] === '1' ? 'morph1' : 'morph2', subKey = parts[1], id = parts[2];
+                    const data = appData[morphKey]; if (data && data[subKey]) { data[subKey] = data[subKey].filter(item => item.id !== id); saveAllData(appData); renderSubPage(morph, sub); }
                 });
             });
-
             container.querySelectorAll('[data-edit]').forEach(btn => {
                 btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    playWoodSound();
-                    const parts = this.dataset.edit.split('|');
-                    const morphKey = parts[0] === '1' ? 'morph1' : 'morph2';
-                    const subKey = parts[1];
-                    const id = parts[2];
-                    const data = appData[morphKey];
-                    if (!data || !data[subKey]) return;
-                    const item = data[subKey].find(i => i.id === id);
-                    if (!item) return;
-                    const newText = prompt('编辑内容：', item.text || '');
-                    if (newText !== null && newText.trim() !== '') {
-                        item.text = newText.trim();
-                        saveAllData(appData);
-                        renderSubPage(morph, sub);
-                    }
+                    e.stopPropagation(); playWoodSound(); const parts = this.dataset.edit.split('|'); const morphKey = parts[0] === '1' ? 'morph1' : 'morph2', subKey = parts[1], id = parts[2];
+                    const data = appData[morphKey]; if (!data || !data[subKey]) return; const item = data[subKey].find(i => i.id === id); if (!item) return;
+                    const newText = prompt('编辑内容：', item.text || ''); if (newText !== null && newText.trim() !== '') { item.text = newText.trim(); saveAllData(appData); renderSubPage(morph, sub); }
                 });
             });
-
             container.querySelectorAll('.grid-item').forEach(el => {
                 el.addEventListener('click', function(e) {
-                    if (e.target.classList.contains('grid-del-btn')) return;
-                    const img = this.querySelector('img');
-                    if (!img) return;
-                    playWoodSound();
-                    const allImgs = container.querySelectorAll('.grid-item img');
-                    viewerImages = Array.from(allImgs).map(i => i.src);
-                    viewerIndex = viewerImages.indexOf(img.src);
-                    document.getElementById('viewerImg').src = img.src;
-                    document.getElementById('viewerDesc').textContent = this.dataset.desc || '';
-                    document.getElementById('imageViewer').classList.add('open');
+                    if (e.target.classList.contains('grid-del-btn')) return; const img = this.querySelector('img'); if (!img) return;
+                    playWoodSound(); const allImgs = container.querySelectorAll('.grid-item img'); viewerImages = Array.from(allImgs).map(i => i.src); viewerIndex = viewerImages.indexOf(img.src);
+                    document.getElementById('viewerImg').src = img.src; document.getElementById('viewerDesc').textContent = this.dataset.desc || ''; document.getElementById('imageViewer').classList.add('open');
+                });
+            });
+        }
+
+        function bindSharedEvents(container, type) {
+            container.querySelector('[data-shared-back]')?.addEventListener('click', function() {
+                playWoodSound(); document.getElementById('page-home').classList.remove('shared-mode');
+                const homeMorphs = document.getElementById('home-morphs'), homeShared = document.getElementById('home-shared');
+                if (homeMorphs) homeMorphs.style.display = ''; if (homeShared) homeShared.style.display = '';
+                container.innerHTML = ''; currentShared = null;
+            });
+            container.querySelector('[data-shared-upload]')?.addEventListener('click', function() {
+                playWoodSound(); currentShared = type; document.getElementById('uploadModal').classList.add('open'); document.getElementById('uploadDesc').value = ''; document.getElementById('uploadFile').value = ''; document.getElementById('fileNameDisplay').textContent = '';
+            });
+            container.querySelectorAll('[data-shared-del]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation(); playWoodSound(); if (!confirm('确定要删除吗？')) return; const parts = this.dataset.sharedDel.split('|'), t = parts[0], id = parts[1];
+                    if (appData.shared && appData.shared[t]) { appData.shared[t] = appData.shared[t].filter(item => item.id !== id); saveAllData(appData); renderSharedPage(t); }
+                });
+            });
+            container.querySelectorAll('[data-shared-edit]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation(); playWoodSound(); const parts = this.dataset.sharedEdit.split('|'), t = parts[0], id = parts[1];
+                    if (!appData.shared || !appData.shared[t]) return; const item = appData.shared[t].find(i => i.id === id); if (!item) return;
+                    const newText = prompt('编辑内容：', item.text || ''); if (newText !== null && newText.trim() !== '') { item.text = newText.trim(); saveAllData(appData); renderSharedPage(t); }
+                });
+            });
+            container.querySelectorAll('.grid-item').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('grid-del-btn')) return; const img = this.querySelector('img'); if (!img) return;
+                    playWoodSound(); const allImgs = container.querySelectorAll('.grid-item img'); viewerImages = Array.from(allImgs).map(i => i.src); viewerIndex = viewerImages.indexOf(img.src);
+                    document.getElementById('viewerImg').src = img.src; document.getElementById('viewerDesc').textContent = this.dataset.desc || ''; document.getElementById('imageViewer').classList.add('open');
                 });
             });
         }
 
         // ================================================================
-        // 事件绑定：共用子页面
+        // 查看器控制 & 事件绑定
         // ================================================================
-        function bindSharedEvents(container, type) {
-            container.querySelector('[data-shared-back]')?.addEventListener('click', function() {
-                playWoodSound();
-                document.getElementById('page-home').classList.remove('shared-mode');
-                const homeMorphs = document.getElementById('home-morphs');
-                const homeShared = document.getElementById('home-shared');
-                if (homeMorphs) homeMorphs.style.display = '';
-                if (homeShared) homeShared.style.display = '';
-                container.innerHTML = '';
-                currentShared = null;
-            });
+        document.getElementById('viewerClose').addEventListener('click', function() { playWoodSound(); document.getElementById('imageViewer').classList.remove('open'); });
+        document.getElementById('imageViewer').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+        document.getElementById('viewerPrev').addEventListener('click', function() { if (viewerImages.length > 0) { viewerIndex = (viewerIndex - 1 + viewerImages.length) % viewerImages.length; document.getElementById('viewerImg').src = viewerImages[viewerIndex]; document.getElementById('viewerDesc').textContent = ''; } });
+        document.getElementById('viewerNext').addEventListener('click', function() { if (viewerImages.length > 0) { viewerIndex = (viewerIndex + 1) % viewerImages.length; document.getElementById('viewerImg').src = viewerImages[viewerIndex]; document.getElementById('viewerDesc').textContent = ''; } });
 
-            container.querySelector('[data-shared-upload]')?.addEventListener('click', function() {
-                playWoodSound();
-                currentShared = type;
-                document.getElementById('uploadModal').classList.add('open');
+        document.querySelectorAll('.home-morph').forEach(el => {
+            el.addEventListener('click', function() {
+                playWoodSoundPage(); const morph = this.dataset.morph; const sharedContainer = document.getElementById('shared-container'); if (sharedContainer) sharedContainer.innerHTML = '';
+                const homeMorphs = document.getElementById('home-morphs'), homeShared = document.getElementById('home-shared');
+                if (homeMorphs) homeMorphs.style.display = ''; if (homeShared) homeShared.style.display = ''; currentShared = null; document.getElementById('page-home').classList.remove('shared-mode');
+                switchPage('page-morph' + morph); currentMorph = morph; setTimeout(() => setupQuestion(morph), 50);
+                const submit = document.getElementById('q-submit-' + morph), input = document.getElementById('q-input-' + morph);
+                if (submit) { submit.onclick = function() { handleQuestionSubmit(morph); }; } if (input) { input.onkeydown = function(e) { if (e.key === 'Enter') handleQuestionSubmit(morph); }; }
+            });
+        });
+
+        document.querySelectorAll('.shared-btn').forEach(el => { el.addEventListener('click', function() { playWoodSound(); const type = this.dataset.shared; renderSharedPage(type); }); });
+        document.querySelectorAll('.morph-header .back-btn').forEach(btn => { btn.addEventListener('click', function() { playWoodSoundPage(); switchPage('page-home'); document.querySelectorAll('#sub1-container, #sub2-container').forEach(c => c.innerHTML = ''); document.querySelectorAll('.btn-grid').forEach(el => el.style.display = ''); document.querySelectorAll('.question-area').forEach(el => el.style.display = ''); }); });
+        document.querySelectorAll('.morph-btn, .morph-btn-text').forEach(btn => { btn.addEventListener('click', function() { playWoodSound(); const sub = this.dataset.sub, morph = sub.slice(-1), subKey = sub.slice(0, -1); currentMorph = morph; currentSub = subKey; currentShared = null; renderSubPage(morph, subKey); }); });
+
+        // ================================================================
+        // 上传弹窗 (修复多选、冲突、压缩)
+        // ================================================================
+        document.getElementById('modalCancel').addEventListener('click', function() { playWoodSound(); document.getElementById('uploadModal').classList.remove('open'); });
+        document.getElementById('uploadModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+        document.getElementById('uploadFile').addEventListener('change', function() {
+            const count = this.files.length;
+            document.getElementById('fileNameDisplay').textContent = count > 0 ? `已选 ${count} 张图片` : '';
+        });
+
+        // 图片压缩函数
+        function compressImage(file, maxWidth = 800, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width, height = img.height;
+                        if (width > maxWidth) { height = Math.round((maxWidth / width) * height); width = maxWidth; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                };
+                reader.onerror = reject;
+            });
+        }
+
+        document.getElementById('modalSubmit').addEventListener('click', async function() {
+            playWoodSound();
+            const fileInput = document.getElementById('uploadFile');
+            const files = Array.from(fileInput.files);
+            const desc = document.getElementById('uploadDesc').value.trim();
+
+            if (files.length === 0 && !desc) { alert('请上传图片或填写描述！'); return; }
+
+            const submitBtn = this;
+            submitBtn.disabled = true;
+            submitBtn.textContent = '上传中...';
+
+            try {
+                const targetKey = currentShared ? 'shared' : (currentMorph === '1' ? 'morph1' : 'morph2');
+                const subKey = currentShared ? currentShared : currentSub;
+
+                if (!appData[targetKey][subKey]) appData[targetKey][subKey] = [];
+
+                if (files.length > 0) {
+                    // 压缩所有图片并依次读取
+                    const compressedImages = await Promise.all(files.map(file => compressImage(file)));
+                    compressedImages.forEach(imgData => {
+                        appData[targetKey][subKey].unshift({
+                            id: generateId(),
+                            type: 'image',
+                            text: desc || '无描述',
+                            img: imgData,
+                            date: getToday()
+                        });
+                    });
+                } else {
+                    appData[targetKey][subKey].unshift({
+                        id: generateId(),
+                        type: 'text',
+                        text: desc,
+                        img: '',
+                        date: getToday()
+                    });
+                }
+
+                saveAllData(appData);
+                document.getElementById('uploadModal').classList.remove('open');
                 document.getElementById('uploadDesc').value = '';
                 document.getElementById('uploadFile').value = '';
                 document.getElementById('fileNameDisplay').textContent = '';
-            });
 
-            container.querySelectorAll('[data-shared-del]').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    playWoodSound();
-                    if (!confirm('确定要删除吗？')) return;
-                    const parts = this.dataset.sharedDel.split('|');
-                    const t = parts[0];
-                    const id = parts[1];
-                    if (appData.shared && appData.shared[t]) {
-                        appData.shared[t] = appData.shared[t].filter(item => item.id !== id);
-                        saveAllData(appData);
-                        renderSharedPage(t);
-                    }
-                });
-            });
-
-            container.querySelectorAll('[data-shared-edit]').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    playWoodSound();
-                    const parts = this.dataset.sharedEdit.split('|');
-                    const t = parts[0];
-                    const id = parts[1];
-                    if (!appData.shared || !appData.shared[t]) return;
-                    const item = appData.shared[t].find(i => i.id === id);
-                    if (!item) return;
-                    const newText = prompt('编辑内容：', item.text || '');
-                    if (newText !== null && newText.trim() !== '') {
-                        item.text = newText.trim();
-                        saveAllData(appData);
-                        renderSharedPage(t);
-                    }
-                });
-            });
-
-            container.querySelectorAll('.grid-item').forEach(el => {
-                el.addEventListener('click', function(e) {
-                    if (e.target.classList.contains('grid-del-btn')) return;
-                    const img = this.querySelector('img');
-                    if (!img) return;
-                    playWoodSound();
-                    const allImgs = container.querySelectorAll('.grid-item img');
-                    viewerImages = Array.from(allImgs).map(i => i.src);
-                    viewerIndex = viewerImages.indexOf(img.src);
-                    document.getElementById('viewerImg').src = img.src;
-                    document.getElementById('viewerDesc').textContent = this.dataset.desc || '';
-                    document.getElementById('imageViewer').classList.add('open');
-                });
-            });
-        }
-
-        // ================================================================
-        // 查看器控制
-        // ================================================================
-        document.getElementById('viewerClose').addEventListener('click', function() {
-            playWoodSound();
-            document.getElementById('imageViewer').classList.remove('open');
-        });
-        document.getElementById('imageViewer').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('open');
-        });
-        document.getElementById('viewerPrev').addEventListener('click', function() {
-            if (viewerImages.length > 0) {
-                viewerIndex = (viewerIndex - 1 + viewerImages.length) % viewerImages.length;
-                document.getElementById('viewerImg').src = viewerImages[viewerIndex];
-                document.getElementById('viewerDesc').textContent = '';
-            }
-        });
-        document.getElementById('viewerNext').addEventListener('click', function() {
-            if (viewerImages.length > 0) {
-                viewerIndex = (viewerIndex + 1) % viewerImages.length;
-                document.getElementById('viewerImg').src = viewerImages[viewerIndex];
-                document.getElementById('viewerDesc').textContent = '';
-            }
-        });
-
-        // ================================================================
-        // 事件绑定
-        // ================================================================
-        document.querySelectorAll('.home-morph').forEach(el => {
-            el.addEventListener('click', function() {
-                playWoodSoundPage();
-                const morph = this.dataset.morph;
-                const sharedContainer = document.getElementById('shared-container');
-                if (sharedContainer) sharedContainer.innerHTML = '';
-                const homeMorphs = document.getElementById('home-morphs');
-                const homeShared = document.getElementById('home-shared');
-                if (homeMorphs) homeMorphs.style.display = '';
-                if (homeShared) homeShared.style.display = '';
-                currentShared = null;
-                document.getElementById('page-home').classList.remove('shared-mode');
-
-                switchPage('page-morph' + morph);
-                currentMorph = morph;
-                setTimeout(() => setupQuestion(morph), 50);
-                const submit = document.getElementById('q-submit-' + morph);
-                const input = document.getElementById('q-input-' + morph);
-                if (submit) { submit.onclick = function() { handleQuestionSubmit(morph); }; }
-                if (input) { input.onkeydown = function(e) { if (e.key === 'Enter') handleQuestionSubmit(morph); }; }
-            });
-        });
-
-        document.querySelectorAll('.shared-btn').forEach(el => {
-            el.addEventListener('click', function() {
-                playWoodSound();
-                const type = this.dataset.shared;
-                renderSharedPage(type);
-            });
-        });
-
-        document.querySelectorAll('.morph-header .back-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                playWoodSoundPage();
-                switchPage('page-home');
-                document.querySelectorAll('#sub1-container, #sub2-container').forEach(c => c.innerHTML = '');
-                document.querySelectorAll('.btn-grid').forEach(el => el.style.display = '');
-                document.querySelectorAll('.question-area').forEach(el => el.style.display = '');
-            });
-        });
-
-        document.querySelectorAll('.morph-btn, .morph-btn-text').forEach(btn => {
-            btn.addEventListener('click', function() {
-                playWoodSound();
-                const sub = this.dataset.sub;
-                const morph = sub.slice(-1);
-                const subKey = sub.slice(0, -1);
-                currentMorph = morph;
-                currentSub = subKey;
-                currentShared = null;
-                renderSubPage(morph, subKey);
-            });
-        });
-
-        // ================================================================
-        // 上传弹窗
-        // ================================================================
-        document.getElementById('modalCancel').addEventListener('click', function() {
-            playWoodSound();
-            document.getElementById('uploadModal').classList.remove('open');
-        });
-        document.getElementById('uploadModal').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('open');
-        });
-        document.getElementById('uploadFile').addEventListener('change', function() {
-            document.getElementById('fileNameDisplay').textContent = this.files[0] ? this.files[0].name : '';
-        });
-
-        document.getElementById('modalSubmit').addEventListener('click', function() {
-            playWoodSound();
-            const file = document.getElementById('uploadFile').files[0];
-            const desc = document.getElementById('uploadDesc').value.trim();
-            if (!file && !desc) {
-                alert('请上传图片或填写描述！');
-                return;
-            }
-
-            if (currentShared) {
-                const t = currentShared;
-                if (!appData.shared) appData.shared = { guzi: [], letter: [] };
-                if (!appData.shared[t]) appData.shared[t] = [];
-                const saveItem = (imgData) => {
-                    appData.shared[t].unshift({
-                        id: generateId(),
-                        type: imgData ? 'image' : 'text',
-                        text: desc || '无描述',
-                        img: imgData || '',
-                        date: getToday()
-                    });
-                    saveAllData(appData);
-                    document.getElementById('uploadModal').classList.remove('open');
-                    renderSharedPage(t);
-                    alert('✅ 上传成功！');
-                };
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) { saveItem(e.target.result); };
-                    reader.readAsDataURL(file);
+                if (currentShared) {
+                    renderSharedPage(currentShared);
                 } else {
-                    saveItem('');
-                }
-                return;
-            }
-
-            const morphKey = currentMorph === '1' ? 'morph1' : 'morph2';
-            const subKey = currentSub;
-            if (!appData[morphKey][subKey]) appData[morphKey][subKey] = [];
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    appData[morphKey][subKey].unshift({
-                        id: generateId(),
-                        type: 'image',
-                        text: desc || '无描述',
-                        img: e.target.result,
-                        date: getToday()
-                    });
-                    saveAllData(appData);
-                    document.getElementById('uploadModal').classList.remove('open');
                     renderSubPage(currentMorph, currentSub);
-                    alert('✅ 上传成功！');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                appData[morphKey][subKey].unshift({
-                    id: generateId(),
-                    type: 'text',
-                    text: desc,
-                    img: '',
-                    date: getToday()
-                });
-                saveAllData(appData);
-                document.getElementById('uploadModal').classList.remove('open');
-                renderSubPage(currentMorph, currentSub);
+                }
                 alert('✅ 上传成功！');
+            } catch (e) {
+                console.error(e);
+                alert('上传失败，请重试！可能是图片过大，已尝试压缩。');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '确认上传';
             }
         });
 
@@ -1975,10 +973,8 @@
         // 启动
         // ================================================================
         (async () => {
-            // 绑定管理员按钮
             document.getElementById('admin-toggle').addEventListener('click', toggleAdmin);
             updateAdminButton();
-
             switchPage('page-home');
             await initSupabase();
             await syncFromCloud();
